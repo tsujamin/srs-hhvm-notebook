@@ -40,6 +40,24 @@ Some pairs of reference counting operations can be [ommited][refcount-opts.cpp] 
 ###IR Tracing
 HHVM can be configured to output the IR (Intermediate Representation) of each function it encounters. This is enabled by running HHVM in an environment where `TRACE=printir:2` is enabled. The trace will be found in `/tmp/hphp.log`. The JIT emiited assembly can also be output alongside the IR, but this requires HHVM to be compiled against libxed (which can be found in the tarball for [Intel PIN][intel_pin]). The subsequent cmake command is:
 ```cmake -DCMAKE_BUILD_TYPE=Debug -DLibXed_INCLUDE_DIR=/home/benjamin/Downloads/pin-2.13-62141-gcc.4.4.7-linux/extras/xed2-intel64/include -DLibXed_LIBRARY=/home/benjamin/Downloads/pin-2.13-62141-gcc.4.4.7-linux/extras/xed2-intel64/lib/libxed.a```
+
+###Jemalloc Memory Profiler Dump
+The jemalloc memory profiler can be accessed through hhvm, while running in server mode through the admin interface.
+
+For this, jemalloc must be compiled with the profiler enabled.
+`./configure --prefix=$CMAKE_PREFIX_PATH --enable-prof`
+
+Start the hhvm in server mode, and assign an admin port. Start the jemalloc profiler:
+`GET http://hhvmserverip:adminport/jemalloc-prof-activate`
+If you get Error 2 at this point, it means you didn't compile jemalloc with the profiler enabled.
+
+And then you can also get a jemalloc memory profiler dump by:
+`GET http://hhvmserverip:adminport/jemalloc-prof-dump`
+
+If successful, a file starting with `jeprof` should appear in the directory that hhvm was started from.
+If however you got `Error 14` when attempting to get the jemalloc-prof-dump, it probably means that the leak memory profiler wans't enabled in jemalloc. This can be enabled by changing the jemalloc sources.
+`jemalloc/src/prof.c:25: bool opt_prof_leak = true;`
+
 ##Achievements
 
 ##Other
