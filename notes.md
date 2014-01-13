@@ -58,6 +58,30 @@ If successful, a file starting with `jeprof` should appear in the directory that
 If however you got `Error 14` when attempting to get the jemalloc-prof-dump, it probably means that the leak memory profiler wans't enabled in jemalloc. This can be enabled by changing the jemalloc sources.  
 `jemalloc/src/prof.c:25: bool opt_prof_leak = true;`
 
+To get all possible jemalloc commands, check the admin interface of hhvm.
+
+###HHProf (pprof compatible)
+For the hhprof, you need to enable it in the compile flags of hhvm.  
+`-DMEMORY_PROFILING`
+To make this part of debug mode, you can add it to hhvm/CMake/HPHPSetup.cmake . In the if statement for `CMAKE_BUILD_TYPE`, you can add it underneath `add_definitions(-DDEBUG)` as `add_definitions(-DMEMORY_PROFILING)`
+
+You also need to enable it during runtime using `-vHHProfServer.Enabled=true`  
+Other HHProfServer options are:  
+```-vHHProfServer.Port                    -- 4327
+-vHHProfServer.Threads                 -- 2
+-vHHProfServer.TimeoutSeconds          -- 30
+-vHHProfServer.ProfileClientMode       -- true
+-vHHProfServer.AllocationProfile       -- false
+-vHHProfServer.Filter.MinAllocPerReq   -- 2
+-vHHProfServer.Filter.MinBytesPerReq   -- 128```
+
+Just list with jemalloc, you can then activate and deactivate HHProf using:  
+`GET http://localhost:4327/hhprof/start`  
+`GET http://localhost:4327/hhprof/stop`
+
+You can then access the HHProf server using pprof:  
+`pprof http://localhost:4327/pprof/heap`
+
 ##Achievements
 
 ##Other
