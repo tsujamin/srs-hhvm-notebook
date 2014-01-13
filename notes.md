@@ -67,12 +67,12 @@ To make this part of debug mode, you can add it to hhvm/CMake/HPHPSetup.cmake . 
 
 You also need to enable it during runtime using `-vHHProfServer.Enabled=true`  
 Other HHProfServer options are:  
-```-vHHProfServer.Port                    -- 4327
--vHHProfServer.Threads                 -- 2
--vHHProfServer.TimeoutSeconds          -- 30
--vHHProfServer.ProfileClientMode       -- true
--vHHProfServer.AllocationProfile       -- false
--vHHProfServer.Filter.MinAllocPerReq   -- 2
+```-vHHProfServer.Port                    -- 4327  
+-vHHProfServer.Threads                 -- 2  
+-vHHProfServer.TimeoutSeconds          -- 30  
+-vHHProfServer.ProfileClientMode       -- true  
+-vHHProfServer.AllocationProfile       -- false  
+-vHHProfServer.Filter.MinAllocPerReq   -- 2  
 -vHHProfServer.Filter.MinBytesPerReq   -- 128```
 
 Just list with jemalloc, you can then activate and deactivate HHProf using:  
