@@ -44,18 +44,18 @@ HHVM can be configured to output the IR (Intermediate Representation) of each fu
 ###Jemalloc Memory Profiler Dump
 The jemalloc memory profiler can be accessed through hhvm, while running in server mode through the admin interface.
 
-For this, jemalloc must be compiled with the profiler enabled.
+For this, jemalloc must be compiled with the profiler enabled.  
 `./configure --prefix=$CMAKE_PREFIX_PATH --enable-prof`
 
-Start the hhvm in server mode, and assign an admin port. Start the jemalloc profiler:
-`GET http://hhvmserverip:adminport/jemalloc-prof-activate`
+Start the hhvm in server mode, and assign an admin port. Start the jemalloc profiler:  
+`GET http://hhvmserverip:adminport/jemalloc-prof-activate`  
 If you get Error 2 at this point, it means you didn't compile jemalloc with the profiler enabled.
 
-And then you can also get a jemalloc memory profiler dump by:
+And then you can also get a jemalloc memory profiler dump by:  
 `GET http://hhvmserverip:adminport/jemalloc-prof-dump`
 
-If successful, a file starting with `jeprof` should appear in the directory that hhvm was started from.
-If however you got `Error 14` when attempting to get the jemalloc-prof-dump, it probably means that the leak memory profiler wans't enabled in jemalloc. This can be enabled by changing the jemalloc sources.
+If successful, a file starting with `jeprof` should appear in the directory that hhvm was started from.  
+If however you got `Error 14` when attempting to get the jemalloc-prof-dump, it probably means that the leak memory profiler wans't enabled in jemalloc. This can be enabled by changing the jemalloc sources.  
 `jemalloc/src/prof.c:25: bool opt_prof_leak = true;`
 
 ##Achievements
