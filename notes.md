@@ -1,4 +1,4 @@
-  #HipHop VM Notes
+#HipHop VM Notes
 
 ##JIT/Interpreter
 
