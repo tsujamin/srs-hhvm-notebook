@@ -4,12 +4,15 @@
 
 ##Reference Counting
 The semantics of the PHP language require [reference counting][php_refcounting] to be immediate, specifically in relation to the passing and copying of arrays (Copy on Write semantics). This obviously causes some major performance penalties as each php reference mutation requires the destination objects reference count to be modified.
+
 ###Reference counting in C++ 
 Parallel to the reference counting operations performed in HHVM's JIT there is another reference counting infrastructure involving precompiled C++ code. This will be referred to as the C++ Reference Counting. 
 
 This type of reference counting is primarily implemented by the calling of various macro's defined in [countable.h][countable.h] by various counted classes (different macros exist for non-static and potentially-static reference counted objects). The macros operate on a `int_32t` field named `m_count` which is defined in each of the various reference counted classes. It is asserted that this field is at a 12 byte offset from the start of the object as defined by the `FAST_REFCOUNT_OFFSET` constant in [types.h][types.h]. A atomic variant of m_count is defined in [countable.h][countable.h].
+
 ###Reference counting in the JIT
 When code is executed using the JIT a new set of reference counting functions become involved. These can be found in [code-gen-x64.cpp][cg-x64], [code-gen-helpers-x64.cpp][cgh-x64] and their respective ARM equivalents. The modification of these functions such that they perform no operation seems to disable reference counting in the JIT (this can observed by analysing the IR emmited by hhvm's printir trace). A list of these functions follows:
+
 ####[code-gen-helpers-x64.cpp][cgh-x64]
  + void emitIncRef(Asm& as, PhysReg base)
  + void emitIncRefCheckNonStatic(Asm& as, PhysReg base, DataType dtype)
@@ -39,8 +42,14 @@ This is may not be an exhaustive list of the functions involved; it simply lists
 Some pairs of reference counting operations can be [ommited][refcount-opts.cpp] by the JIT if proven to not affect the overall reachability of objects. 
 
 ##Memory Management
+Memory management within HHVM is split into several different varieties. 
+
+1. At the lowest level we have raw calls to `malloc`, `free` and friends. The default build for HHVM is to use /jemalloc/ instead of system `malloc`.
+   Memory chunks allocated using these commands are typically internal C++ objects, but sometimes they are used for PHP objects (certain types of `StringData`) as an optimisation.
+2. We have the so-called "Smart Memory Manager", written in C++ and backed by 2MB 'slabs' allocated with `malloc`.
 
 ##Profiling/Instrumentation 
+
 ###IR Tracing
 HHVM can be configured to output the IR (Intermediate Representation) of each function it encounters. This is enabled by running HHVM in an environment where `TRACE=printir:2` is enabled. The trace will be found in `/tmp/hphp.log`. The JIT emiited assembly can also be output alongside the IR, but this requires HHVM to be compiled against libxed (which can be found in the tarball for [Intel PIN][intel_pin]). The subsequent cmake command is:
 ```cmake -DCMAKE_BUILD_TYPE=Debug 
