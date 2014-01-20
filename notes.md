@@ -44,9 +44,34 @@ Some pairs of reference counting operations can be [ommited][refcount-opts.cpp] 
 ##Memory Management
 Memory management within HHVM is split into several different varieties. 
 
-1. At the lowest level we have raw calls to `malloc`, `free` and friends. The default build for HHVM is to use /jemalloc/ instead of system `malloc`.
-   Memory chunks allocated using these commands are typically internal C++ objects, but sometimes they are used for PHP objects (certain types of `StringData`) as an optimisation.
-2. We have the so-called "Smart Memory Manager", written in C++ and backed by 2MB 'slabs' allocated with `malloc`.
+1. At the lowest level we have raw calls to `malloc`, `free` and friends. The
+   default build for HHVM is to use /jemalloc/ instead of system `malloc`.
+   
+   Memory chunks allocated using these commands are typically internal C++
+   objects, but sometimes they are used for PHP objects (certain types of
+   `StringData`) as an optimisation.
+   
+2. We have the so-called "Smart Memory Manager", written in C++ and backed by
+   2MB 'slabs' allocated with `malloc`. The Smart Memory Manager is thread-local
+   and functions similar to a 'reap' (heap-region).
+
+The way that both allocation types are mixed and matched within HHVM makes it
+difficult at times to figure out what is going on.
+
+The Smart Memory Manager itself handles three different types of requests,
+documented in `memory-manager.cpp`:
+
+ - Large allocations. These fall through to the associated 'Big' variants of the
+   functions, and are tracked on their own sweep list. They are managed directly
+   using the system functions (`malloc`, `free`, `allocm`). A large allocation
+   is one that is larger than 2K in size.
+ - Known-size small allocations. These are managed directly using the back-end
+   functions, which is troublesome, but presumably an optimisation of some
+   sort. For example, certain objects are allocated using `objMalloc` and
+   `objFree`, which utilise the back-end functions.
+ - Unknown-size small allocations. These are allocated onto the slab and freed
+   onto a freelist. In the case that the allocation is actually too a large one,
+   it falls through to the 'large allocations' category.
 
 ##Profiling/Instrumentation 
 
