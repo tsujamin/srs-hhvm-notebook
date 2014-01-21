@@ -84,10 +84,10 @@ documented in [memory-manager.cpp][memory-manager.cpp]:
    onto a freelist. In the case that the allocation is actually too a large one,
    it falls through to the 'large allocations' category.
 
+![picture](images/mm_call_graph.png "Memory manager call graph")
+
 At the conclusion of a request `void hphp_session_exit()` is executed ([program-functions.cpp][program-functions.cpp]). This function is responsible for calling the `Sweepable::sweep()`([sweepable.h][sweepable.h]) method of all enlisted sweepable objects via `MemoryManager::sweep()` ([memory-manager.cpp][memory-manager.cpp]) and calls `MemoryManager::resetAllocator()` (also in [memory-manager.cpp][memory-manager.cpp]).
 `MemoryManager::resetAllocator()` is responsible for freeing the slabs allocated by the memory manager, deallocates non-persistent large allocations and sweeps the enlisted strings.
-
-![picture](images/mm_call_graph.png "Memory manager call graph")
 
 ##Profiling/Instrumentation 
 
