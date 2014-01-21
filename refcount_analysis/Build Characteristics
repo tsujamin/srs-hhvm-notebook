@@ -1,0 +1,2 @@
+master-bumppoint: based on HHVM master except with a bump-point allocator in place of the 
+	free-list SmartMemoryManager. Does not dealloc slabs or sweep at request end.
