@@ -53,7 +53,7 @@ Memory management within HHVM is split into several different varieties.
    
 2. We have the so-called "Smart Memory Manager", written in C++ and backed by
    2MB 'slabs' allocated with `malloc`. The Smart Memory Manager is thread-local
-   and functions similar to a 'reap' (heap-region).
+   and functions similarly to a 'reap' (heap-region).
 
 The way that both allocation types are mixed and matched within HHVM makes it
 difficult at times to figure out what is going on.
