@@ -56,7 +56,7 @@ While not throughly investigated it appears strings ([string-data.h][string-data
 Memory management within HHVM is split into several different varieties. 
 
 1. At the lowest level we have raw calls to `malloc`, `free` and friends. The
-   default build for HHVM is to use /jemalloc/ instead of system `malloc`.
+   default build for HHVM is to use _jemalloc_ instead of system `malloc`.
    
    Memory chunks allocated using these commands are typically internal C++
    objects, but sometimes they are used for PHP objects (certain types of
