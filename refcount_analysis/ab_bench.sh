@@ -1,5 +1,5 @@
 #! /bin/bash
-cd $HOME/Report\ Results
+cd results
 for hhvm_build in hhvmbumpnocount hhvmbump hhvmnocount hhvmclean
 do
 
@@ -27,3 +27,6 @@ do
 		done
 	done
 done
+echo “executing csvify.sh”
+cd ..
+./csvify.sh
