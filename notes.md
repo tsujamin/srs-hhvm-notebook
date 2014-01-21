@@ -3,19 +3,19 @@
 ##JIT/Interpreter
 
 ##Reference Counting
-The semantics of the PHP language require [reference counting][php_refcounting] to be immediate, specifically in relation to the passing and copying of arrays (Copy on Write semantics). This obviously causes some major performance penalties as each php reference mutation requires the destination objects reference count to be modified.
+The semantics of the PHP language require [reference counting][php_refcounting] to be immediate, specifically in relation to the passing and copying of arrays (Copy on Write semantics). This obviously causes some major performance penalties as each PHP reference mutation requires the destination objects reference count to be modified.
 
 ###Reference counting in C++ 
 Parallel to the reference counting operations performed in HHVM's JIT there is another reference counting infrastructure involving precompiled C++ code. This will be referred to as the C++ Reference Counting. 
 
 This type of reference counting is primarily implemented by the calling of various macro's defined in [countable.h][countable.h] by various counted classes (different macros exist for non-static and potentially-static reference counted objects). The macros operate on a `int_32t` field named `m_count` which is defined in each of the various reference counted classes. It is asserted that this field is at a 12 byte offset from the start of the object as defined by the `FAST_REFCOUNT_OFFSET` constant in [types.h][types.h]. A atomic variant of m_count is defined in [countable.h][countable.h].
 
-Unfortunatly there are multple places in the codebase where reference counting is reimplemented (ie. where [countable.h][countable.h] is not used) and m_count is directly manipulated. For the purpose of removing reference counting many of these occurances were removed/modified in [this commit][inconsistant_refcounting]. While some of these occurances may be required for the VM to behave properly there are certainly cases where, for consistancies sake, the present reference counting infrastructure should have been used.
+Unfortunately there are multiple places in the code base where reference counting is reimplemented (ie. where [countable.h][countable.h] is not used) and m_count is directly manipulated. For the purpose of removing reference counting many of these occurrences were removed/modified in [this commit][inconsistant_refcounting]. While some of these occurrences may be required for the VM to behave properly there are certainly cases where, for consistencies sake, the present reference counting infrastructure should have been used.
 
-While its behaviour was analysed as part of this project, [ref-data.h][ref-data.h] appears to be a special case with regards to reference counting. It acts as a compatibility layer between the ZendPHP and HipHopVM implementation of RefData's and manipulates its apparent reference count in a non standard fashion
+While its behavior was analysed as part of this project, [ref-data.h][ref-data.h] appears to be a special case with regards to reference counting. It acts as a compatibility layer between the ZendPHP and HipHopVM implementation of RefData's and manipulates its apparent reference count in a non standard fashion
 
 ###Reference counting in the JIT
-When code is executed using the JIT a new set of reference counting functions become involved. These can be found in [code-gen-x64.cpp][cg-x64], [code-gen-helpers-x64.cpp][cgh-x64] and their respective ARM equivalents. The modification of these functions such that they perform no operation seems to disable reference counting in the JIT (this can observed by analysing the IR emmited by hhvm's printir trace). A list of these functions follows:
+When code is executed using the JIT a new set of reference counting functions become involved. These can be found in [code-gen-x64.cpp][cg-x64], [code-gen-helpers-x64.cpp][cgh-x64] and their respective ARM equivalents. The modification of these functions such that they perform no operation seems to disable reference counting in the JIT (this can observed by analysing the IR emitted by hhvm's printir trace). A list of these functions follows:
 
 ####[code-gen-helpers-x64.cpp][cgh-x64]
  + void emitIncRef(Asm& as, PhysReg base)
@@ -46,9 +46,9 @@ This is may not be an exhaustive list of the functions involved; it simply lists
 Some pairs of reference counting operations can be [ommited][refcount-opts.cpp] by the JIT if proven to not affect the overall reachability of objects.
 
 ###PHP Semantics and Reference Counting:
-The PHP language mandates pass-by-value semantics which naivly implemented incurs a relivitly large perfomance penalty. In order to optimise this requirement (particualy in the case of arrays) PHP engines implement copy-on-write arrays. That is if the variable is assigned the value of an array, that array will only be copied in memory at the time a write is made to it. This requires knowledge of the number of references to an object (exact reference counting) and as such causes issues when reference counting is removed from the system.
+The PHP language mandates pass-by-value semantics which naively implemented incurs a relativity large performance penalty. In order to optimise this requirement (particularly in the case of arrays) PHP engines implement copy-on-write arrays. That is if the variable is assigned the value of an array, that array will only be copied in memory at the time a write is made to it. This requires knowledge of the number of references to an object (exact reference counting) and as such causes issues when reference counting is removed from the system.
 
-The behaviour of [array-data.cpp][array-data.cpp] depends higly on the result of the function `bool hasMultipleRefs() const` (as defined in [countable.h][countable.h]) which, in an environment without exact reference counting, will not return a realistic value. If the function always returns `true` arrays will likely be needlessly copied on mutation  resulting in a performance penalty. If it always returns `false` then arrays which should exist seperatly may still resolve to the same object. The actual behaviour in these circumstances remains untested and as such these comments may not reflect reality.
+The behavior of [array-data.cpp][array-data.cpp] depends highly on the result of the function `bool hasMultipleRefs() const` (as defined in [countable.h][countable.h]) which, in an environment without exact reference counting, will not return a realistic value. If the function always returns `true` arrays will likely be needlessly copied on mutation  resulting in a performance penalty. If it always returns `false` then arrays which should exist separately may still resolve to the same object. The actual behavior in these circumstances remains untested and as such these comments may not reflect reality.
 
 While not throughly investigated it appears strings ([string-data.h][string-data.h]) perform similar optimisations when mutated.
 
@@ -89,7 +89,7 @@ documented in `memory-manager.cpp`:
 ##Profiling/Instrumentation 
 
 ###IR Tracing
-HHVM can be configured to output the IR (Intermediate Representation) of each function it encounters. This is enabled by running HHVM in an environment where `TRACE=printir:2` is enabled. The trace will be found in `/tmp/hphp.log`. The JIT emiited assembly can also be output alongside the IR, but this requires HHVM to be compiled against libxed (which can be found in the tarball for [Intel PIN][intel_pin]). The subsequent cmake command is:
+HHVM can be configured to output the IR (Intermediate Representation) of each function it encounters. This is enabled by running HHVM in an environment where `TRACE=printir:2` is enabled. The trace will be found in `/tmp/hphp.log`. The JIT emitted assembly can also be output alongside the IR, but this requires HHVM to be compiled against libxed (which can be found in the tarball for [Intel PIN][intel_pin]). The subsequent cmake command is:
 ```cmake -DCMAKE_BUILD_TYPE=Debug 
  -DLibXed_INCLUDE_DIR=/home/benjamin/Downloads/pin-2.13-62141-gcc.4.4.7-linux/extras/xed2-intel64/include
  -DLibXed_LIBRARY=/home/benjamin/Downloads/pin-2.13-62141-gcc.4.4.7-linux/extras/xed2-intel64/lib/libxed.a```
@@ -108,7 +108,7 @@ And then you can also get a jemalloc memory profiler dump by:
 `GET http://hhvmserverip:adminport/jemalloc-prof-dump`
 
 If successful, a file starting with `jeprof` should appear in the directory that hhvm was started from.  
-If however you got `Error 14` when attempting to get the jemalloc-prof-dump, it probably means that the leak memory profiler wans't enabled in jemalloc. This can be enabled by changing the jemalloc sources.  
+If however you got `Error 14` when attempting to get the jemalloc-prof-dump, it probably means that the leak memory profiler wasn't enabled in jemalloc. This can be enabled by changing the jemalloc sources.  
 `jemalloc/src/prof.c:25: bool opt_prof_leak = true;`
 
 To get all possible jemalloc commands, check the admin interface of hhvm.
