@@ -1,0 +1,61 @@
+digraph G {
+    ranksep=0.75;
+    {
+        smart_calloc;
+        smartCallocBig;
+        safe_calloc;
+        
+        smart_malloc;
+        smartMalloc;
+        smartMallocBig;
+        safe_malloc;
+        smartMallocSize;
+        smartMallocSizeBig;
+        objMalloc;
+
+        smart_realloc;
+        smartRealloc;
+
+        smart_free;
+        smartFree;
+        smartFreeBig;
+        smartFreeSize;
+        smartFreeSizeBig;
+        objFree;
+
+        malloc [color=blue];
+        allocm [color=blue];
+        free [color=blue];
+        realloc [color=blue];
+        calloc [color=blue];
+
+        slab_freelist [color=green][label="slab with freelist"];
+        
+        smart_calloc -> smart_malloc [label="S"];
+        smart_calloc -> smartCallocBig [label="L"];
+        smartCallocBig -> safe_calloc -> calloc;
+
+        smart_malloc -> smartMalloc;
+        smartMalloc -> smartMallocBig [label="L"];
+        smartMallocBig -> safe_malloc -> malloc;
+        smartMalloc -> smartMallocSize [label="S"];
+        objMalloc -> smartMallocSize [label="S"];
+        objMalloc -> smartMallocSizeBig [label="L"];
+        smartMallocSizeBig -> smartMallocSizeBigHelper -> allocm;
+        smartMallocSize -> slab_freelist;
+        smartMallocSizeBig -> smartMallocBig [label="w/o jemalloc"];
+
+        smart_realloc -> smartRealloc;
+        smartRealloc -> smart_malloc [label="S"];
+        smartRealloc -> smart_free [label="S"];
+        smartRealloc -> realloc [label="L"];
+
+        objFree -> smartFreeSize [label="S"];
+        objFree -> smartFreeSizeBig [label="L"];
+        smartFreeSizeBig -> smartFreeBig;
+        smart_free -> smartFree -> smartFreeBig [label="L"];
+        smartFreeBig -> free;
+        smartFree -> smartFreeSize [label="S"];
+        smartFreeSize -> slab_freelist;
+    }
+}

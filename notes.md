@@ -49,11 +49,11 @@ Memory management within HHVM is split into several different varieties.
    
    Memory chunks allocated using these commands are typically internal C++
    objects, but sometimes they are used for PHP objects (certain types of
-   `StringData`) as an optimisation.
+   strings) as an optimisation.
    
 2. We have the so-called "Smart Memory Manager", written in C++ and backed by
    2MB 'slabs' allocated with `malloc`. The Smart Memory Manager is thread-local
-   and functions similar to a 'reap' (heap-region).
+   and functions similarly to a 'reap' (heap-region).
 
 The way that both allocation types are mixed and matched within HHVM makes it
 difficult at times to figure out what is going on.
@@ -72,6 +72,8 @@ documented in `memory-manager.cpp`:
  - Unknown-size small allocations. These are allocated onto the slab and freed
    onto a freelist. In the case that the allocation is actually too a large one,
    it falls through to the 'large allocations' category.
+
+![picture](graph.png "Memory manager call graph")
 
 ##Profiling/Instrumentation 
 
