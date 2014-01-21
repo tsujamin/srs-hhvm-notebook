@@ -84,7 +84,7 @@ documented in `memory-manager.cpp`:
    onto a freelist. In the case that the allocation is actually too a large one,
    it falls through to the 'large allocations' category.
 
-![picture](graph.png "Memory manager call graph")
+![picture](images/mm_call_graph.png "Memory manager call graph")
 
 ##Profiling/Instrumentation 
 
