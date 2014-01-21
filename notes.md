@@ -10,6 +10,10 @@ Parallel to the reference counting operations performed in HHVM's JIT there is a
 
 This type of reference counting is primarily implemented by the calling of various macro's defined in [countable.h][countable.h] by various counted classes (different macros exist for non-static and potentially-static reference counted objects). The macros operate on a `int_32t` field named `m_count` which is defined in each of the various reference counted classes. It is asserted that this field is at a 12 byte offset from the start of the object as defined by the `FAST_REFCOUNT_OFFSET` constant in [types.h][types.h]. A atomic variant of m_count is defined in [countable.h][countable.h].
 
+Unfortunatly there are multple places in the codebase where reference counting is reimplemented (ie. where [countable.h][countable.h] is not used) and m_count is directly manipulated. For the purpose of removing reference counting many of these occurances were removed/modified in [this commit][inconsistant_refcounting]. While some of these occurances may be required for the VM to behave properly there are certainly cases where, for consistancies sake, the present reference counting infrastructure should have been used.
+
+While its behaviour was analysed as part of this project, [ref-data.h][ref-data.h] appears to be a special case with regards to reference counting. It acts as a compatibility layer between the ZendPHP and HipHopVM implementation of RefData's and manipulates its apparent reference count in a non standard fashion
+
 ###Reference counting in the JIT
 When code is executed using the JIT a new set of reference counting functions become involved. These can be found in [code-gen-x64.cpp][cg-x64], [code-gen-helpers-x64.cpp][cgh-x64] and their respective ARM equivalents. The modification of these functions such that they perform no operation seems to disable reference counting in the JIT (this can observed by analysing the IR emmited by hhvm's printir trace). A list of these functions follows:
 
@@ -39,7 +43,14 @@ When code is executed using the JIT a new set of reference counting functions be
 
 This is may not be an exhaustive list of the functions involved; it simply lists those that were identified and modified in the process of disabling reference counting. There exists other sections of the JIT where reference counting is performed (through the direct manipulation of the data at an objects `FAST_REFCOUNT_OFFSET`) and these can be in [this branch comparison][norefcount-master-compare].
 
-Some pairs of reference counting operations can be [ommited][refcount-opts.cpp] by the JIT if proven to not affect the overall reachability of objects. 
+Some pairs of reference counting operations can be [ommited][refcount-opts.cpp] by the JIT if proven to not affect the overall reachability of objects.
+
+###PHP Semantics and Reference Counting:
+The PHP language mandates pass-by-value semantics which naivly implemented incurs a relivitly large perfomance penalty. In order to optimise this requirement (particualy in the case of arrays) PHP engines implement copy-on-write arrays. That is if the variable is assigned the value of an array, that array will only be copied in memory at the time a write is made to it. This requires knowledge of the number of references to an object (exact reference counting) and as such causes issues when reference counting is removed from the system.
+
+The behaviour of [array-data.cpp][array-data.cpp] depends higly on the result of the function `bool hasMultipleRefs() const` (as defined in [countable.h][countable.h]) which, in an environment without exact reference counting, will not return a realistic value. If the function always returns `true` arrays will likely be needlessly copied on mutation  resulting in a performance penalty. If it always returns `false` then arrays which should exist seperatly may still resolve to the same object. The actual behaviour in these circumstances remains untested and as such these comments may not reflect reality.
+
+While not throughly investigated it appears strings ([string-data.h][string-data.h]) perform similar optimisations when mutated.
 
 ##Memory Management
 Memory management within HHVM is split into several different varieties. 
@@ -141,3 +152,7 @@ You can then access the HHProf server using pprof:
 [norefcount-master-compare]: https://github.com/TsukasaUjiie/hhvm/compare/master...consistant_refcounting#diff-346a8263f676cff3a20324eb9fb34231R4199
 [countable.h]: https://github.com/TsukasaUjiie/hhvm/blob/master/hphp/runtime/base/countable.h
 [types.h]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/types.h
+[inconsistant_refcounting]: https://github.com/TsukasaUjiie/hhvm/commit/8ed7fcac87a3b9dc9d07078a619c2db1506089b4
+[ref-data.h]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/ref-data.h
+[array-data.cpp]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/array-data.cpp
+[string-data.h]: https://github.com/facebook/hhvm/blob/9793cd605932044fe1c1e719350d1efdee1cca69/hphp/runtime/base/string-data.h
