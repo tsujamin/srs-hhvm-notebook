@@ -145,6 +145,7 @@ The branches resulting from the removal of reference counting and memory managem
  - [hhvmnocount][hhvmnocount]: A branch of HHVM with reference counting operations disabled. Currently suffers seg-faults when build in Release mode (but not in Debug) 
  - [hhvmbump][hhvmbump]: A branch with a continuous allocator in place of the free-list based smart allocator. Treats all sized allocations as a single type. Still performs reference counting operations. Used as a baseline comparison to hhvmnocount due to similar memory characteristics.
  - [hhvmbumpnocount][hhvmbumpnocount]: A merger of the hhvmbump and hhvmnocount branches
+
 ###Reference counting analysis
 DISCUSS METHODOLOGY AND MOTIVATION
 ####Tools
