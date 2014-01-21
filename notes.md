@@ -1,7 +1,5 @@
 #HipHop VM Notes
 
-##JIT/Interpreter
-
 ##Reference Counting
 The semantics of the PHP language require [reference counting][php_refcounting] to be immediate, specifically in relation to the passing and copying of arrays (Copy on Write semantics). This obviously causes some major performance penalties as each PHP reference mutation requires the destination objects reference count to be modified.
 
@@ -144,9 +142,9 @@ You can then access the HHProf server using pprof:
 ###Modified HipHopVM Builds
 The branches resulting from the removal of reference counting and memory management follow. They all trace their common ancestry to a single, upstream HHVM commit. For consistency's sake, none of these branches build assertions into their debug configurations
  - [hhvmclean][hhvmclean]: The effective parent of all the following branches. 
- - [hhvmnocount][hhvmnocount]
- - [hhvmbump][hhvmbump]
- - [hhvmbumpnocount][hhvmbumpnocount]
+ - [hhvmnocount][hhvmnocount]: A branch of HHVM with reference counting operations disabled. Currently suffers segfaults when build in Release mode (but not in Debug) 
+ - [hhvmbump][hhvmbump]: A branch with a continuous allocator in place of the free-list based smart allocator. Treats all sized allocations as a single type. Still performs reference counting operations. Used as a baseline comparison to hhvmnocount due to similar memory characteristics.
+ - [hhvmbumpnocount][hhvmbumpnocount]: A merger of the hhvmbump and hhvmnocount branches
 
 ##Other
 
