@@ -10,7 +10,7 @@ Parallel to the reference counting operations performed in HHVM's JIT there is a
 
 This type of reference counting is primarily implemented by the calling of various macro's defined in [countable.h][countable.h] by various counted classes (different macros exist for non-static and potentially-static reference counted objects). The macros operate on a `int_32t` field named `m_count` which is defined in each of the various reference counted classes. It is asserted that this field is at a 12 byte offset from the start of the object as defined by the `FAST_REFCOUNT_OFFSET` constant in [types.h][types.h]. A atomic variant of m_count is defined in [countable.h][countable.h].
 
-Unfortunately there are multiple places in the code base where reference counting is reimplemented (ie. where [countable.h][countable.h] is not used) and m_count is directly manipulated. For the purpose of removing reference counting many of these occurrences were removed/modified in [this commit][inconsistant_refcounting]. While some of these occurrences may be required for the VM to behave properly there are certainly cases where, for consistencies sake, the present reference counting infrastructure should have been used.
+Unfortunately there are multiple places in the code base where reference counting is reimplemented (ie. where [countable.h][countable.h] is not used) and m_count is directly manipulated. For the purpose of removing reference counting many of these occurrences were removed/modified in [this commit][inconsistant_refcounting_commit]. While some of these occurrences may be required for the VM to behave properly there are certainly cases where, for consistencies sake, the present reference counting infrastructure should have been used.
 
 While its behavior was analysed as part of this project, [ref-data.h][ref-data.h] appears to be a special case with regards to reference counting. It acts as a compatibility layer between the ZendPHP and HipHopVM implementation of RefData's and manipulates its apparent reference count in a non standard fashion
 
@@ -70,7 +70,7 @@ The way that both allocation types are mixed and matched within HHVM makes it
 difficult at times to figure out what is going on.
 
 The Smart Memory Manager itself handles three different types of requests,
-documented in `memory-manager.cpp`:
+documented in [memory-manager.cpp][memory-manager.cpp]:
 
  - Large allocations. These fall through to the associated 'Big' variants of the
    functions, and are tracked on their own sweep list. They are managed directly
@@ -83,6 +83,9 @@ documented in `memory-manager.cpp`:
  - Unknown-size small allocations. These are allocated onto the slab and freed
    onto a freelist. In the case that the allocation is actually too a large one,
    it falls through to the 'large allocations' category.
+
+At the conclusion of a request `void hphp_session_exit()` is executed ([program-functions.cpp][program-functions.cpp]). This function is responsible for calling the `Sweepable::sweep()`([sweepable.h][sweepable.h]) method of all enlisted sweepable objects via `MemoryManager::sweep()` ([memory-manager.cpp][memory-manager.cpp]) and calls `MemoryManager::resetAllocator()` (also in [memory-manager.cpp][memory-manager.cpp]).
+`MemoryManager::resetAllocator()` is responsible for freeing the slabs allocated by the memory manager, deallocates non-persistent large allocations and sweeps the enlisted strings.
 
 ![picture](images/mm_call_graph.png "Memory manager call graph")
 
@@ -116,7 +119,7 @@ To get all possible jemalloc commands, check the admin interface of hhvm.
 ###HHProf (pprof compatible)
 For the hhprof, you need to enable it in the compile flags of hhvm.  
 `-DMEMORY_PROFILING`
-To make this part of debug mode, you can add it to hhvm/CMake/HPHPSetup.cmake . In the if statement for `CMAKE_BUILD_TYPE`, you can add it underneath `add_definitions(-DDEBUG)` as `add_definitions(-DMEMORY_PROFILING)`
+To make this part of debug mode, you can add it to [HPHPSetup.cmake][HPHPSetup.cmake] . In the if statement for `CMAKE_BUILD_TYPE`, you can add it underneath `add_definitions(-DDEBUG)` as `add_definitions(-DMEMORY_PROFILING)`
 
 You also need to enable it during runtime using `-vHHProfServer.Enabled=true`  
 Other HHProfServer options are:  
@@ -137,7 +140,13 @@ Just list with jemalloc, you can then activate and deactivate HHProf using:
 You can then access the HHProf server using pprof:  
 `pprof http://localhost:4327/pprof/heap`
 
-##Achievements
+##Resulting Work and Achievements
+###Modified HipHopVM Builds
+The branches resulting from the removal of reference counting and memory management follow. They all trace their common ancestry to a single, upstream HHVM commit. For consistency's sake, none of these branches build assertions into their debug configurations
+ - [hhvmclean][hhvmclean]: The effective parent of all the following branches. 
+ - [hhvmnocount][hhvmnocount]
+ - [hhvmbump][hhvmbump]
+ - [hhvmbumpnocount][hhvmbumpnocount]
 
 ##Other
 
@@ -149,10 +158,22 @@ You can then access the HHProf server using pprof:
 [refcount-opts.cpp]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/vm/jit/refcount-opts.cpp
 [cg-x64]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/vm/jit/code-gen-x64.cpp
 [cgh-x64]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/vm/jit/code-gen-helpers-x64.cpp
-[norefcount-master-compare]: https://github.com/TsukasaUjiie/hhvm/compare/master...consistant_refcounting#diff-346a8263f676cff3a20324eb9fb34231R4199
 [countable.h]: https://github.com/TsukasaUjiie/hhvm/blob/master/hphp/runtime/base/countable.h
 [types.h]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/types.h
-[inconsistant_refcounting]: https://github.com/TsukasaUjiie/hhvm/commit/8ed7fcac87a3b9dc9d07078a619c2db1506089b4
 [ref-data.h]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/ref-data.h
 [array-data.cpp]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/array-data.cpp
-[string-data.h]: https://github.com/facebook/hhvm/blob/9793cd605932044fe1c1e719350d1efdee1cca69/hphp/runtime/base/string-data.h
+[string-data.h]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/string-data.h
+[program-functions.cpp]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/program-functions.cpp
+[memory-manager.cpp]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/memory-manager.cpp
+[sweepable.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/sweepable.h
+[HPHPSetup.cmake]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/CMake/HPHPSetup.cmake
+
+[repo_branches]: below
+[inconsistant_refcounting_commit]: https://github.com/TsukasaUjiie/hhvm/commit/8ed7fcac87a3b9dc9d07078a619c2db1506089b4
+[norefcount-master-compare]: https://github.com/TsukasaUjiie/hhvm/compare/master...consistant_refcounting#diff-346a8263f676cff3a20324eb9fb34231R4199
+[hhvmclean]: https://github.com/TsukasaUjiie/hhvm/tree/master
+[hhvmnocount]: https://github.com/TsukasaUjiie/hhvm/tree/consistant_refcounting
+[hhvmbump]: https://github.com/TsukasaUjiie/hhvm/tree/master-bumppoint
+[hhvmbumpnocount]: https://github.com/TsukasaUjiie/hhvm/tree/bump-point-no-refcounting
+
+
