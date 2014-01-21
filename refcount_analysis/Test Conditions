@@ -1,0 +1,3 @@
+All servers run with flags "-m s -p 8080 -vEval.Jit=true".
+A single warm up request was run before each benchmark
+sudo swapoff -a was called before benchmark sessions
