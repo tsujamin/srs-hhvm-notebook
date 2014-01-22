@@ -155,14 +155,28 @@ The branches resulting from the removal of reference counting and memory managem
  - [hhvmbumpnocount][hhvmbumpnocount]: A merger of the hhvmbump and hhvmnocount branches
 
 ###Reference counting analysis
-DISCUSS METHODOLOGY AND MOTIVATION
-####Tools
+One of our tasks was to determine the performance penalty incurred by the use of eager reference counting in hhvm. In order to do this we worked to remove as many reference count mutating operations from the code bases static code and disable the emitting of reference counting related JIT operations. These changes resulted in the branch ([hhvmnocount][hhvmnocount]) being incomparible to the standard hhvm build due to wildly different memory usage characteristics. In order to isolate the effect of reference counting alone, this build was merged with and compared to a build with a continuous allocator ([hhvmbumpnocount][hhvmbumpnocount] and [hhvmbump][hhvmbump]). As they all now exhibited similar memory usage patterns, reference counting could be isolated in the following benchmarks.
+
+####Benchmarks
 A small benchmark analysis was performed on 3 of these branches (all except [hhvmnocount][hhvmnocount] due to seg-faults in Release configuration) of which the sources and results can be found in [refcount_analysis][refcount_analysis]. The benchmark is executed using [ab_bench.sh][ab_bench.sh] which in turn executes `ab` of various configurations on each of the builds. This (along with [csvify.sh][csvify.sh]) produces the data required for the following three Matlab graphing functions (all are surfaces graphed against total and concurrent requests):
  - `graph_precentage_surf(percentage )` [(link)][graph_percentage_surf]: the time required by `percentagee` of the requests to complete
  - `graph_request_surf()` [(link)][graph_request_surf]: the number of requests per second processed
  - `graph_total_surf()` [(link)][graph_total_surf]: total time required to execute requests
+ #CONFIGUTARION
 
 ####Results
+The first set of graphs show the time required by various percentages of the requests performed to complete (lower is better).
+![percentage_20_surf](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
+This graph shows that, for the lower 20% of response times, the number performance of each of the builds is dependent on the number of concurrent requests. This involves a small sample size and may not be representative. 
+![percentage_50_surf](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
+Of all the graphs in this section, this one is the most interesting and useful. It shows that in the majority of benchmarks [hhvmbumpnocount][hhvmbumpnocount] performs the worst despite the fact it should perform **less** operations than [hhvmbump][hhvmbump] (which still performs reference counting). This is a startling result which will be discussed momentarily
+![percentage_80_surf](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
+This graph is less useful as, due to the large sample size and long warm-up response times, alot of noise is present. It still shows that, like the previous graph, [hhvmbumpnobump][hhvmbumpnobump] performs the worst.
+
+The second set of graphs show the number of requests processed per second and the total time required to execute the requests.
+![request_ps_surf](images/request_ps_surf_graph.png "Average requests per second of benchmark")
+
+![total_time_surf](images/total_time_surf_graph.png "Total execution time of benchmark")
 GRAPHS AND JUSTIFICATION (IE ARRAYDATA COPYING)
 
 ##Other
