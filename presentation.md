@@ -27,5 +27,22 @@ Before continuing we will briefly introduce some relevant concepts
 
 ##Reference Counting in the PHP language
 
+##Reference Counting in HHVM
+
+##Memory Management
+
+##OTHER
+
+#Our Tasks
+
+##BEN TASK
+
+##JAN TASK
+
+##NATHAN TASK
+
+#Conclusion and Further Work
+
+[render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
 [links]: below
 [hhvm_github]: https://github.com/facebook/hhvm
