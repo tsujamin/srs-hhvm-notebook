@@ -54,7 +54,7 @@ While not throughly investigated it appears strings ([string-data.h][string-data
 Memory management within HHVM is split into several different varieties. 
 
 1. At the lowest level we have raw calls to `malloc`, `free` and friends. The
-   default build for HHVM is to use /jemalloc/ instead of system `malloc`.
+   default build for HHVM is to use _jemalloc_ instead of system `malloc`.
    
    Memory chunks allocated using these commands are typically internal C++
    objects, but sometimes they are used for PHP objects (certain types of
@@ -142,15 +142,29 @@ You can then access the HHProf server using pprof:
 ###Modified HipHopVM Builds
 The branches resulting from the removal of reference counting and memory management follow. They all trace their common ancestry to a single, upstream HHVM commit. For consistency's sake, none of these branches build assertions into their debug configurations
  - [hhvmclean][hhvmclean]: The effective parent of all the following branches. 
- - [hhvmnocount][hhvmnocount]: A branch of HHVM with reference counting operations disabled. Currently suffers segfaults when build in Release mode (but not in Debug) 
+ - [hhvmnocount][hhvmnocount]: A branch of HHVM with reference counting operations disabled. Currently suffers seg-faults when build in Release mode (but not in Debug) 
  - [hhvmbump][hhvmbump]: A branch with a continuous allocator in place of the free-list based smart allocator. Treats all sized allocations as a single type. Still performs reference counting operations. Used as a baseline comparison to hhvmnocount due to similar memory characteristics.
  - [hhvmbumpnocount][hhvmbumpnocount]: A merger of the hhvmbump and hhvmnocount branches
+
+###Reference counting analysis
+One of our tasks was to determine the performance penalty incurred by the use of eager reference counting in hhvm. In order to do this we worked to remove as many reference count mutating operations from the code bases static code and disable the emitting of reference counting related JIT operations. These changes resulted in the branch ([hhvmnocount][hhvmnocount]) being incomparible to the standard hhvm build due to wildly different memory usage characteristics. In order to isolate the effect of reference counting alone, this build was merged with and compared to a build with a continuous allocator ([hhvmbumpnocount][hhvmbumpnocount] and [hhvmbump][hhvmbump]). As they all now exhibited similar memory usage patterns, reference counting could be isolated in the following benchmarks.
+
+####Benchmarks
+A small benchmark analysis was performed on 3 of these branches (all except [hhvmnocount][hhvmnocount] due to seg-faults in Release configuration) of which the sources and results can be found in [refcount_analysis][refcount_analysis]. The benchmark is executed using [ab_bench.sh][ab_bench.sh] which in turn executes `ab` of various configurations on each of the builds. This (along with [csvify.sh][csvify.sh]) produces the data required for the following three Matlab graphing functions (all are surfaces graphed against total and concurrent requests):
+ - `graph_precentage_surf(percentage )` [(link)][graph_percentage_surf]: the time required by `percentagee` of the requests to complete
+ - `graph_request_surf()` [(link)][graph_request_surf]: the number of requests per second processed
+ - `graph_total_surf()` [(link)][graph_total_surf]: total time required to execute requests
+
+####Results
+
+GRAPHS AND JUSTIFICATION (IE ARRAYDATA COPYING)
 
 ##Other
 
 [references]: below
 [php_refcounting]: http://www.php.net/manual/en/features.gc.refcounting-basics.php
 [intel_pin]: http://download-software.intel.com/sites/landingpage/pintool/downloads/pin-2.13-62141-gcc.4.4.7-linux.tar.gz
+[ab]: http://httpd.apache.org/docs/2.2/programs/ab.html
 
 [code_references]: below
 [refcount-opts.cpp]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/vm/jit/refcount-opts.cpp
@@ -173,5 +187,17 @@ The branches resulting from the removal of reference counting and memory managem
 [hhvmnocount]: https://github.com/TsukasaUjiie/hhvm/tree/consistant_refcounting
 [hhvmbump]: https://github.com/TsukasaUjiie/hhvm/tree/master-bumppoint
 [hhvmbumpnocount]: https://github.com/TsukasaUjiie/hhvm/tree/bump-point-no-refcounting
+
+[rc_analysis_references]: below
+[refcount_analysis]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/tree/master/refcount_analysis
+[ab_bench.sh]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/tree/master/refcount_analysis/ab_bench.sh
+[csvify.sh]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/tree/master/refcount_analysis/csvify.sh
+[results.tgz]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/tree/master/refcount_analysis/results.tgz
+[graph_percentage_surf]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/blob/master/refcount_analysis/graph_percentage_surf.m
+[graph_total_surf]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/blob/master/refcount_analysis/graph_total_surf.m
+[graph_request_surf]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/blob/master/refcount_analysis/graph_request_surf.m
+
+
+
 
 
