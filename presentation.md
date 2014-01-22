@@ -179,7 +179,7 @@ Due to time constraints, several questions and problems remain unsolved:
 
 #Physical Memory Profile (Jan Zimmer)
 
-##Physical Memory Profile
+##Memory Utilisation
 
 ![](images/PhysicalMemory1.png "Memory utilization")
 
