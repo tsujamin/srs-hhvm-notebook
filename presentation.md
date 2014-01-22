@@ -112,6 +112,59 @@ The configuration used for benchmarking:
 
 ##Physical Memory Profile
 - Memory utilization
+
+![](images/PhysicalMemory1.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory2.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory3.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory4.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory5.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory6.png "Memory utilization")
+
+----------------
+
+- What HHVM can give us
+
+![](images/PhysicalMemory7.png "Memory utilization")
+
+----------------
+
+- What Valgrind can give us
+
+![](images/PhysicalMemory8.png "Memory utilization")
+
+----------------
+
+- What Valgrind and HHVM can give us
+
+![](images/PhysicalMemory9.png "Memory utilization")
+
+----------------
+
 - Tool: Valgrind
   - Get Memory Sectors from HHVM
   - Monitor memory loads and stores from valgrind
@@ -121,14 +174,8 @@ The configuration used for benchmarking:
 ##NATHAN TASK
 
 #Conclusion and Further Work
-<<<<<<< HEAD
-
-[render_command]: pandoc -t beamer ~/Documents/presentation.md -V theme:Warsaw -o ~/Documents/presentation.pdf
-[links]: below
-=======
 [render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
 [references]: below
->>>>>>> d838fb7a709ba889e12533b440260b969ced458f
 [hhvm_github]: https://github.com/facebook/hhvm
 
 [code_references]: below
