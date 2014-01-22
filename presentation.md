@@ -29,14 +29,17 @@ Before continuing we will briefly introduce some relevant concepts
  - Based on explicit garbage collection (reference counting)
  - Required by language semantics
  - PHP is **pass by value**
+ - Pass by value can be slow due to large amount of copies (especially with large arrays)
+ 
 
 -----------------------
 
- - Pass by value can be slow due to large amount of copies (especially with large arrays)
  - Solution: Copy on Write!
  - Problem: Need to know current reference count
  - Each mutation requires immediate increment and decrement of reference counts
- - Advantage: Immediate garbage reclamation 
+ - Advantage: Immediate garbage reclamation
+ - **This requirement will cause us major problems shortly**
+ 
 
 ##Reference Counting in HHVM (C++)
  - Reference counted objects have an `int_32t m_count` field and call a macro in [countable.h][countable.h] containing various reference counting operations (`incRefCont()`, `hasMultipleRefs()`, `decRefAndRelease()` etc)
@@ -50,12 +53,13 @@ Before continuing we will briefly introduce some relevant concepts
  - **Both these systems operate separately from each other (while sharing `m_count`) and the memory manager**
  
 ##Memory Management
-
+ - MENTION REQUEST LOCAL ETC, REQUIRED FOR CONTEXT LATER ON
 ##OTHER
 
 #Our Tasks
 
 ##HHVM Without Reference Counting
+ - 
 
 ##JAN TASK
 
