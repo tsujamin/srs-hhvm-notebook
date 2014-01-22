@@ -169,7 +169,7 @@ A small benchmark analysis was performed on 3 of these branches (all except [hhv
   - Fedora20 based workstation
   - Linux kernel version: 3.12.6-300.fc20.x86_64
   - Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
-  - 4x4G *MHZ
+  - 4x4G 1600MHz DDR3
   - Swap Disabled
   - hhvm builds on internal SSD
 
@@ -218,6 +218,7 @@ Contrary to expectations, the naive removal of reference counting from hhvm resu
 [memory-manager-inl.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/memory-manager-inl.h
 [sweepable.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/sweepable.h
 [HPHPSetup.cmake]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/CMake/HPHPSetup.cmake
+
 
 [repo_branches]: below
 [inconsistant_refcounting_commit]: https://github.com/TsukasaUjiie/hhvm/commit/8ed7fcac87a3b9dc9d07078a619c2db1506089b4

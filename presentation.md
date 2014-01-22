@@ -91,8 +91,23 @@ In order to isolate the effects of reference counting a modified memory manager 
  -----------------
  
  - Resulted in the [hhvmbump][hhvmbump] and [hhvmbumpnocount][hhvmbumpnocount] branches.
+ - Reference counting was now isolated, time to run some tests.
  
+##Benchmark Setup
+ - Due to the nature of the changes, it was difficult to find representative PHP packages that ran on all builds
+ - A modified version of a benchmark included in HHVM ([center-of-mass.php][center-of-mass.php]) was chosen due to its heavy memory usage 
+ - [center-of-mass.php][center-of-mass.php] is unlikely to represent the average PHP request but was the only test with sufficient memory usage for benchmarking
  
+------------------ 
+
+The configuration used for benchmarking:
+
+ - Linux kernel version: 3.12.6-300.fc20.x86_64
+ - CPU: Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
+ - Memory: 4x4G DDR3 memory at 1600MHz (no swap partiton)
+ - internal ssd for HHVM builds
+ - Release configuration
+ - Appache Benchmark (ab) with various levels of concurrency and test lengths
 
 ##JAN TASK
 
@@ -105,6 +120,7 @@ In order to isolate the effects of reference counting a modified memory manager 
 
 [code_references]: below
 [countable.h]: https://github.com/TsukasaUjiie/hhvm/blob/master/hphp/runtime/base/countable.h
+[center-of-mass.php]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/blob/master/refcount_analysis/benchmarks/center-of-mass.php
 
 [repo_branches]: below
 [inconsistant_refcounting_commit]: https://github.com/TsukasaUjiie/hhvm/commit/8ed7fcac87a3b9dc9d07078a619c2db1506089b4
