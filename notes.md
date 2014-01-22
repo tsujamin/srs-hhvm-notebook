@@ -99,6 +99,20 @@ documented in [memory-manager.cpp][memory-manager.cpp]:
 At the conclusion of a request `void hphp_session_exit()` is executed ([program-functions.cpp][program-functions.cpp]). This function is responsible for calling the `Sweepable::sweep()`([sweepable.h][sweepable.h]) method of all enlisted sweepable objects via `MemoryManager::sweep()` ([memory-manager.cpp][memory-manager.cpp]) and calls `MemoryManager::resetAllocator()` (also in [memory-manager.cpp][memory-manager.cpp]).
 `MemoryManager::resetAllocator()` is responsible for freeing the slabs allocated by the memory manager, deallocates non-persistent large allocations and sweeps the enlisted strings.
 
+##PHP's type system within HHVM
+PHP has various kinds of data which are represented in HHVM as Type Variants, or
+TVs for short. The definitions for the various types are kept in
+[datatype.h][datatype.h] and the typed objects themselves are small pointer-like
+objects with type TypeVariant, which point to various external data. These are
+kept in [type-variant.h][type-variant.h].
+
+Most of the complex data types are backed by smart-managed memory, specifically
+using `smartMallocSize`, often using the `NEWOBJ` macro. This does make it
+difficult to identify what kind of type a memory slab is being used for, without
+knowing in advance, because it seems to be the case that generally the memory
+manager is used to allocate storage for types, instead of allocating memory for
+the types themselves.
+
 ##Profiling/Instrumentation 
 
 ###IR Tracing
@@ -219,6 +233,8 @@ Contrary to expectations, the naive removal of reference counting from hhvm resu
 [memory-manager.cpp]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/memory-manager.cpp
 [memory-manager-inl.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/memory-manager-inl.h
 [sweepable.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/sweepable.h
+[hphp-value.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/hphp-value.h
+[datatype.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/datatype.h
 [HPHPSetup.cmake]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/CMake/HPHPSetup.cmake
 
 
