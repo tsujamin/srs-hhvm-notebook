@@ -156,7 +156,10 @@ A small benchmark analysis was performed on 3 of these branches (all except [hhv
  - `graph_total_surf()` [(link)][graph_total_surf]: total time required to execute requests
 
 ####Results
-
+The first set of graphs show the time required by various percentages of the requests performed to complete.
+![percentage_20_surf](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
+![percentage_50_surf](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
+![percentage_80_surf](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
 GRAPHS AND JUSTIFICATION (IE ARRAYDATA COPYING)
 
 ##Other
