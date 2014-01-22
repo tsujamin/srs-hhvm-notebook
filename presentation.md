@@ -16,7 +16,7 @@
 ##Our Tasks
  - To isolate the affect of naive reference counting on HHVM's performance
  - To observe how memory access maps to actual physical memory access
- - NATHAN
+ - To map and analyse the behaviour of HHVM's internal memory management
 
 ----------------------
 
@@ -267,7 +267,7 @@ Due to time constraints, several questions and problems remain unsolved:
   - Valgrind alternates with HHVM in execution
 
 
-#NATHAN TASK (Nathan Yong)
+#Understanding the 'Smart' Memory Manager (Nathan Yong)
 
 #Conclusion and Further Work
 
