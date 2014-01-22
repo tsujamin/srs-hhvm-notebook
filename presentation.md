@@ -80,7 +80,7 @@ Removed/Disabled 3 forms of reference counting to create [hhvmnocount][hhvmnocou
  - Completely different memory usage characteristics
  - Hand't yet isolated the effects of reference counting
 
-##Continuos Allocation
+##Continuous Allocation
 In order to isolate the effects of reference counting a modified memory manager was used:
 
  - Memory Manager no longer freed memory, No longer used free lists
@@ -107,7 +107,7 @@ The configuration used for benchmarking:
  - Memory: 4x4G DDR3 memory at 1600MHz (no swap partiton)
  - internal ssd for HHVM builds
  - Release configuration
- - Appache Benchmark (ab) with various levels of concurrency and test lengths
+ - Apache Benchmark (ab) with various levels of concurrency and test lengths
  
 ##Results:
  - Results were graphed as surfaces using Matlab
