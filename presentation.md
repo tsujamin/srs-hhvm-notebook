@@ -181,78 +181,79 @@ Due to time constraints, several questions and problems remain unsolved:
 
 ##Memory Utilisation
 
-![](images/PhysicalMemory1.png "Memory utilization")
+![](images/PhysicalMemory1.png)
 
 ----------------
 
-## Memory utilization
+## Memory utilisation
 
-![](images/PhysicalMemory2.png "Memory utilization")
-
-----------------
-## Memory utilization
-
-![](images/PhysicalMemory3.png "Memory utilization")
+![](images/PhysicalMemory2.png)
 
 ----------------
 
-## Memory utilization
+## Memory utilisation
 
-![](images/PhysicalMemory4.png "Memory utilization")
-
-----------------
-
-## Memory utilization
-
-![](images/PhysicalMemory5.png "Memory utilization")
+![](images/PhysicalMemory3.png)
 
 ----------------
 
-## Memory utilization
+## Memory utilisation
 
-![](images/PhysicalMemory6.png "Memory utilization")
+![](images/PhysicalMemory4.png)
+
+----------------
+
+## Memory utilisation
+
+![](images/PhysicalMemory5.png)
+
+----------------
+
+## Memory utilisation
+
+![](images/PhysicalMemory6.png)
 
 ----------------
 
 ## What HHVM can give us
 
-![](images/PhysicalMemory7.png "Memory utilization")
+![](images/PhysicalMemory7.png)
 
 ----------------
 
 ## What Valgrind can give us
 
-![](images/PhysicalMemory8.png "Memory utilization")
+![](images/PhysicalMemory8.png)
 
 ----------------
 
 ## What Valgrind and HHVM can give us
 
-![](images/PhysicalMemory9.png "Memory utilization")
+![](images/PhysicalMemory9.png)
 
 ----------------
 
 ## How they actually fit together
 
-![](images/PhysicalMemory10.png "Memory utilization")
+![](images/PhysicalMemory10.png)
 
 ----------------
 
 ## How they actually fit together
 
-![](images/PhysicalMemory11.png "Memory utilization")
+![](images/PhysicalMemory11.png)
 
 ----------------
 
 
 ## How they actually fit together
 
-![](images/PhysicalMemory12.png "Memory utilization")
+![](images/PhysicalMemory12.png)
 
 ----------------
 
 
-## What you should get out of it
+## An example of the result
 
 ![](images/PhysicalMemoryGraph.png "Memory utilization")
 
