@@ -77,10 +77,20 @@ documented in [memory-manager.cpp][memory-manager.cpp]:
  - Known-size small allocations. These are managed directly using the back-end
    functions, which is troublesome, but presumably an optimisation of some
    sort. For example, certain objects are allocated using `objMalloc` and
-   `objFree`, which utilise the back-end functions.
+   `objFree`, which utilise the back-end functions. These call the 'size'
+   functions directly in [memory-manager-inl.h](memory-manager-inl.h), and by
+   bypassing the front-facing API they are not put onto the sweepable object
+   list, and are expected to free themselves automatically, usually via
+   reference-counted destruction, invoking the `smartFreeSize` functions. They
+   may also be forgotten at request end, when the memory manager resets the
+   slabs.
  - Unknown-size small allocations. These are allocated onto the slab and freed
-   onto a freelist. In the case that the allocation is actually too a large one,
-   it falls through to the 'large allocations' category.
+   onto a freelist. In the case that the allocation is actually a large one, it
+   falls through to the 'large allocations' category. This category of
+   allocations is managed by the front-facing functions (`smart_malloc`,
+   `smart_free`, `smartMalloc`, etc) located in
+   [memory-manager.cpp](memory-manager.cpp). They are used for the majority of
+   allocations.
 
 ![picture](images/mm_call_graph.png "Memory manager call graph")
 
@@ -205,6 +215,7 @@ Contrary to expectations, the naive removal of reference counting from hhvm resu
 [string-data.h]: https://github.com/facebook/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/string-data.h
 [program-functions.cpp]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/program-functions.cpp
 [memory-manager.cpp]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/memory-manager.cpp
+[memory-manager-inl.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/memory-manager-inl.h
 [sweepable.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/sweepable.h
 [HPHPSetup.cmake]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/CMake/HPHPSetup.cmake
 
