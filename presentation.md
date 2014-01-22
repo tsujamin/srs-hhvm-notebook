@@ -14,7 +14,7 @@
 
 
 ##Our Tasks
- - To isolate the affect of naieve reference counting on HHVM's performance
+ - To isolate the affect of naïve reference counting on HHVM's performance
  - JAN
  - NATHAN
 
