@@ -8,13 +8,14 @@
 ##Background
  - HipHopVM is an Free and Open Source PHP engine
  - Written primarily in C++ with moderate amounts of PHP and x86_64 assembly
- - It uses a JIT compiler (though historically was a PHP to C++ transpiler)
+ - It uses a JIT compiler (though historically it translated PHP to C++ for AOT compilation)
  - It is the PHP engine designed by and which hosts Facebook
  - Its on GitHub! [https://github.com/facebook/hhvm][hhvm_github]
 
 
 ##Our Tasks
- - To isolate the affect of naïve reference counting on HHVM's performance
+ - To isolate the affect of naive reference counting on HHVM's performance
+ - To observe how memory access maps to actual physical memory access
  - JAN
  - NATHAN
 
@@ -60,7 +61,7 @@ Before continuing we will briefly introduce some relevant concepts
  
 ##OTHER
 
-#Our Tasks
+#HHVM Without Reference Counting (Benjamin Roberts)
 
 ##HHVM Without Reference Counting
  - Who needs reference counts? (besides the PHP semantics)
@@ -108,12 +109,69 @@ The configuration used for benchmarking:
  - internal ssd for HHVM builds
  - Release configuration
  - Appache Benchmark (ab) with various levels of concurrency and test lengths
+ 
+##Results:
+ - Results were graphed as surfaces using Matlab
+ - All results are graphed against total requests and concurrent-requests
+ 
+##Percentage Response Times (milliseconds, lower is better)
+![Time taken for 20% of requests to execute](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
 
-##JAN TASK
+-----------------
 
-##NATHAN TASK
+ - The lower 20% of response times are dependant on the build and the number of concurrent requests
+ - Small sample size, not very representative
+ 
+ ----------------
+ 
+![Time taken for 50% of requests to execute](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
+
+-----------------
+
+ - Most interesting of the percentage response graphs
+ - Shows that [hhvmbumpnocount][hhvmbumpnocount] performs the worst in majority of runs.
+ - This is contrary to expectations as it should have performed **less** operations than [hhvmbump][hhvmbump]
+ - Will be discussed shortly
+
+-----------------
+
+![Time taken for 80% of requests to execute](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
+
+-----------------
+
+ - Large sample size now starting to include long-response times from warm-up period
+ - A lot of noise
+ - Still shows, like the previous graph, that [hhvmbumpnocount][hhvmbumpnocount] performs the worst.
+  
+##Requests Processed per Second (higher is better)
+![Average requests per second of benchmark](images/request_ps_surf_graph.png "Average requests per second of benchmark")
+
+------------------
+
+ - This graph shows that the removal of reference counting incurs a notable request processing penalty
+ - Penalty very noticeable in longer benchmark runs
+
+##Total Execution Time
+![Total execution time of benchmark](images/total_time_surf_graph.png "Total execution time of benchmark")
+
+------------------
+
+- Again shows that the removal of reference counting results in longer execution times
+
+#Physical Memory Profile (Jan Zimmer)
+
+##Physical Memory Profile
+- Memory utilization
+- Tool: Valgrind
+  - Get Memory Sectors from HHVM
+  - Monitor memory loads and stores from valgrind
+  - Valgrind a little too powerful
+- Future 
+
+#NATHAN TASK (Nathan Yong)
 
 #Conclusion and Further Work
+
 [render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
 [references]: below
 [hhvm_github]: https://github.com/facebook/hhvm
