@@ -22,7 +22,6 @@
 
 Before continuing we will briefly introduce some relevant concepts
 
-
 #Internals of HHVM
 
 ##Reference Counting in the PHP language
@@ -49,17 +48,51 @@ Before continuing we will briefly introduce some relevant concepts
 ##Reference Counting in HHVM (JIT)
  - `int_32t m_count` at a common offset (12 bytes) in all refcounted objects
  - Several opcodes emit reference counting assembly via the JIT
+ - Intermediate Representation is optimised to remove inc/dec pairs where safe to do so
  - Simpler to locate, more difficult to understand
- - **Both these systems operate separately from each other (while sharing `m_count`) and the memory manager**
+ 
+--------------------
+ 
+**Both these systems are implemented independent of each other (`m_count` and destructors shared) and the memory manager**
  
 ##Memory Management
  - MENTION REQUEST LOCAL ETC, REQUIRED FOR CONTEXT LATER ON
+ 
 ##OTHER
 
 #Our Tasks
 
 ##HHVM Without Reference Counting
- - 
+ - Who needs reference counts? (besides the PHP semantics)
+ - If we are freeing our heap at the end of request, why do we need immediate reclamation?
+ - Lets try nail down the performance penalty of immediate reference counting.
+
+##Lets Modify HHVM 
+Removed/Disabled 3 forms of reference counting to create [hhvmnocount][hhvmnocount]:
+ 
+ - [countable.h][countable.h] functions
+ - JIT emitted reference counting
+ - Various manual mutations and re-implementations (this took a while)
+ 
+ -----------------
+ 
+ - Compared to regular HHVM, [hhvmnocount][hhvmnocount] was much slower
+ - Completely different memory usage characteristics
+ - Hand't yet isolated the effects of reference counting
+
+##Continuos Allocation
+In order to isolate the effects of reference counting a modified memory manager was used:
+
+ - Memory Manager no longer freed memory, No longer used free lists
+ - Large objects no longer special case
+ - Memory not freed at requests end
+ - Objects still _'sweeped'_ due to unreclaimed File and Database objects causing errors.
+ 
+ -----------------
+ 
+ - Resulted in the [hhvmbump][hhvmbump] and [hhvmbumpnocount][hhvmbumpnocount] branches.
+ 
+ 
 
 ##JAN TASK
 
@@ -72,4 +105,12 @@ Before continuing we will briefly introduce some relevant concepts
 
 [code_references]: below
 [countable.h]: https://github.com/TsukasaUjiie/hhvm/blob/master/hphp/runtime/base/countable.h
+
+[repo_branches]: below
+[inconsistant_refcounting_commit]: https://github.com/TsukasaUjiie/hhvm/commit/8ed7fcac87a3b9dc9d07078a619c2db1506089b4
+[norefcount-master-compare]: https://github.com/TsukasaUjiie/hhvm/compare/master...consistant_refcounting#diff-346a8263f676cff3a20324eb9fb34231R4199
+[hhvmclean]: https://github.com/TsukasaUjiie/hhvm/tree/master
+[hhvmnocount]: https://github.com/TsukasaUjiie/hhvm/tree/consistant_refcounting
+[hhvmbump]: https://github.com/TsukasaUjiie/hhvm/tree/master-bumppoint
+[hhvmbumpnocount]: https://github.com/TsukasaUjiie/hhvm/tree/bump-point-no-refcounting
 
