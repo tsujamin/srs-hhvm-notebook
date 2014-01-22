@@ -261,15 +261,10 @@ Due to time constraints, several questions and problems remain unsolved:
 ----------------
 
 
-
-- 
-
 - Tool: Valgrind
   - Get Memory Sectors from HHVM
   - Monitor memory loads and stores from valgrind
-  - Valgrind a little too powerful
-- Future
-
+  - Valgrind alternates with HHVM in execution
 
 
 #NATHAN TASK (Nathan Yong)
