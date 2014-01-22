@@ -14,7 +14,7 @@
 
 
 ##Our Tasks
- - To isolate the affect of naïve reference counting on HHVM's performance
+ - To isolate the affect of naive reference counting on HHVM's performance
  - To observe how memory access maps to actual physical memory access
  - JAN
  - NATHAN
@@ -61,7 +61,7 @@ Before continuing we will briefly introduce some relevant concepts
  
 ##OTHER
 
-#Our Tasks
+#HHVM Without Reference Counting
 
 ##HHVM Without Reference Counting
  - Who needs reference counts? (besides the PHP semantics)
@@ -158,6 +158,8 @@ The configuration used for benchmarking:
 
 - Again shows that the removal of reference counting results in longer execution times
 
+#Physical Memory Profile
+
 ##Physical Memory Profile
 - Memory utilization
 - Tool: Valgrind
@@ -165,6 +167,9 @@ The configuration used for benchmarking:
   - Monitor memory loads and stores from valgrind
   - Valgrind a little too powerful
 - Future 
+
+#NATHAN TASK
+
 
 ##NATHAN TASK
 
