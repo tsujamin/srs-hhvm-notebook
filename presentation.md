@@ -115,7 +115,7 @@ The configuration used for benchmarking:
  - [hhvmnocount][hhvmnocount] is omitted from the results due to segmentation faults in Release configuration
  
 ##Percentage Response Times (milliseconds, lower is better)
-![Time taken for 20% of requests to execute](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
+![Time taken for 20% of requests to execute](images/percentage_20_surf_graph_s.png "Time taken for 20% of requests to execute")
 
 -----------------
 
@@ -124,7 +124,7 @@ The configuration used for benchmarking:
  
  ----------------
  
-![Time taken for 50% of requests to execute](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
+![Time taken for 50% of requests to execute](images/percentage_50_surf_graph_s.png "Time taken for 50% of requests to execute")
 
 -----------------
 
@@ -135,7 +135,7 @@ The configuration used for benchmarking:
 
 -----------------
 
-![Time taken for 80% of requests to execute](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
+![Time taken for 80% of requests to execute](images/percentage_80_surf_graph_s.png "Time taken for 80% of requests to execute")
 
 -----------------
 
@@ -144,7 +144,7 @@ The configuration used for benchmarking:
  - Still shows, like the previous graph, that [hhvmbumpnocount][hhvmbumpnocount] performs the worst.
   
 ##Requests Processed per Second (higher is better)
-![Average requests per second of benchmark](images/request_ps_surf_graph.png "Average requests per second of benchmark")
+![Average requests per second of benchmark](images/request_ps_surf_graph_s.png "Average requests per second of benchmark")
 
 ------------------
 
@@ -152,7 +152,7 @@ The configuration used for benchmarking:
  - Penalty very noticeable in longer benchmark runs
 
 ##Total Execution Time
-![Total execution time of benchmark](images/total_time_surf_graph.png "Total execution time of benchmark")
+![Total execution time of benchmark](images/total_time_surf_graph_s.png "Total execution time of benchmark")
 
 ------------------
 
