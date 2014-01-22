@@ -61,7 +61,7 @@ Before continuing we will briefly introduce some relevant concepts
  
 ##OTHER
 
-#HHVM Without Reference Counting
+#HHVM Without Reference Counting (Benjamin Roberts)
 
 ##HHVM Without Reference Counting
  - Who needs reference counts? (besides the PHP semantics)
@@ -158,7 +158,7 @@ The configuration used for benchmarking:
 
 - Again shows that the removal of reference counting results in longer execution times
 
-#Physical Memory Profile
+#Physical Memory Profile (Jan Zimmer)
 
 ##Physical Memory Profile
 - Memory utilization
@@ -168,7 +168,7 @@ The configuration used for benchmarking:
   - Valgrind a little too powerful
 - Future 
 
-#NATHAN TASK
+#NATHAN TASK (Nathan Yong)
 
 
 ##NATHAN TASK
