@@ -14,8 +14,8 @@
 
 
 ##Our Tasks
- - To isolate the affect of naieve reference counting on HHVM's performance
- - JAN
+ - To isolate the affect of naïve reference counting on HHVM's performance
+ - To observe how memory access maps to actual physical memory access
  - NATHAN
 
 ----------------------
@@ -37,12 +37,18 @@ Before continuing we will briefly introduce some relevant concepts
 
 ##BEN TASK
 
-##JAN TASK
+##Physical Memory Profile
+- Memory utilization
+- Tool: Valgrind
+  - Get Memory Sectors from HHVM
+  - Monitor memory loads and stores from valgrind
+  - Valgrind a little too powerful
+- Future 
 
 ##NATHAN TASK
 
 #Conclusion and Further Work
 
-[render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
+[render_command]: pandoc -t beamer ~/Documents/presentation.md -V theme:Warsaw -o ~/Documents/presentation.pdf
 [links]: below
 [hhvm_github]: https://github.com/facebook/hhvm
