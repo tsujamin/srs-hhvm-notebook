@@ -80,10 +80,11 @@ documented in [memory-manager.cpp][memory-manager.cpp]:
    `objFree`, which utilise the back-end functions. These call the 'size'
    functions directly in [memory-manager-inl.h](memory-manager-inl.h), and by
    bypassing the front-facing API they are not put onto the sweepable object
-   list, and are expected to free themselves automatically, usually via
-   reference-counted destruction, invoking the `smartFreeSize` functions. They
-   may also be forgotten at request end, when the memory manager resets the
-   slabs.
+   list, and are expected to free themselves automatically, invoking the
+   `smartFreeSize` functions. They may also be forgotten at request end, when
+   the memory manager resets the slabs. Typically used for 'internal storage',
+   such as arrays and strings (which delete themselves after hitting a zero
+   reference count), as well as certain types of PHP objects.
  - Unknown-size small allocations. These are allocated onto the slab and freed
    onto a freelist. In the case that the allocation is actually a large one, it
    falls through to the 'large allocations' category. This category of
