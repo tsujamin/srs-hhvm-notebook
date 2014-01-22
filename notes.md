@@ -154,12 +154,21 @@ A small benchmark analysis was performed on 3 of these branches (all except [hhv
  - `graph_precentage_surf(percentage )` [(link)][graph_percentage_surf]: the time required by `percentagee` of the requests to complete
  - `graph_request_surf()` [(link)][graph_request_surf]: the number of requests per second processed
  - `graph_total_surf()` [(link)][graph_total_surf]: total time required to execute requests
+ #CONFIGUTARION
 
 ####Results
-The first set of graphs show the time required by various percentages of the requests performed to complete.
+The first set of graphs show the time required by various percentages of the requests performed to complete (lower is better).
 ![percentage_20_surf](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
+This graph shows that, for the lower 20% of response times, the number performance of each of the builds is dependent on the number of concurrent requests. This involves a small sample size and may not be representative. 
 ![percentage_50_surf](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
+Of all the graphs in this section, this one is the most interesting and useful. It shows that in the majority of benchmarks [hhvmbumpnocount][hhvmbumpnocount] performs the worst despite the fact it should perform **less** operations than [hhvmbump][hhvmbump] (which still performs reference counting). This is a startling result which will be discussed momentarily
 ![percentage_80_surf](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
+This graph is less useful as, due to the large sample size and long warm-up response times, alot of noise is present. It still shows that, like the previous graph, [hhvmbumpnobump][hhvmbumpnobump] performs the worst.
+
+The second set of graphs show the number of requests processed per second and the total time required to execute the requests.
+![request_ps_surf](images/request_ps_surf_graph.png "Average requests per second of benchmark")
+
+![total_time_surf](images/total_time_surf_graph.png "Total execution time of benchmark")
 GRAPHS AND JUSTIFICATION (IE ARRAYDATA COPYING)
 
 ##Other
