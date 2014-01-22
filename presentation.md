@@ -16,7 +16,6 @@
 ##Our Tasks
  - To isolate the affect of naive reference counting on HHVM's performance
  - To observe how memory access maps to actual physical memory access
- - JAN
  - NATHAN
 
 ----------------------
@@ -235,11 +234,34 @@ Due to time constraints, several questions and problems remain unsolved:
 
 ----------------
 
+- How they actually fit together
+
+![](images/PhysicalMemory10.png "Memory utilization")
+
+----------------
+
+- How they actually fit together
+
+![](images/PhysicalMemory11.png "Memory utilization")
+
+----------------
+
+
+- How they actually fit together
+
+![](images/PhysicalMemory12.png "Memory utilization")
+
+----------------
+
+- 
+
 - Tool: Valgrind
   - Get Memory Sectors from HHVM
   - Monitor memory loads and stores from valgrind
   - Valgrind a little too powerful
-- Future 
+- Future
+
+
 
 #NATHAN TASK (Nathan Yong)
 
