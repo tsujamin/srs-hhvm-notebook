@@ -113,6 +113,7 @@ The configuration used for benchmarking:
 ##Results:
  - Results were graphed as surfaces using Matlab
  - All results are graphed against total requests and concurrent-requests
+ - [hhvmnocount][hhvmnocount] is omitted from the results due to segmentation faults in Release configuration
  
 ##Percentage Response Times (milliseconds, lower is better)
 ![Time taken for 20% of requests to execute](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
@@ -157,6 +158,25 @@ The configuration used for benchmarking:
 ------------------
 
 - Again shows that the removal of reference counting results in longer execution times
+
+##Why Did This Happen?
+ - Remains uncertain
+ - Benchmark chosen not representative of real PHP workload?
+ - Copy on Write behaviour?
+ 
+##Copy on Write
+ - As previously mentioned, copy on write requires exact reference counts
+ - ArrayData and StringData mutation behaviour based on the `hasMultipleRefs()` call (which is inaccurate in [hhvmbumpnocount][hhvmbumpnocount] build)
+ - Over zealous copying may have occurred on mutation, resulting in performance penalty
+ - Could be confirmed by profiling and comparing memory usage of [hhvmbump][hhvmbump] and [hhvmbumpnocount][hhvmbumpnocount]
+ 
+##Further Work
+Due to time constraints, several questions and problems remain unsolved:
+
+ - Identify source of negative result
+ - Re-run benchmark with Copy on Assignment semantics (potential method for previous point)
+ - Benchmark true request based GC (This was attempted early on before focus shifted to reference counting)
+ - Analyse the relationship between memory usage and response time (these modifications begin make memory a player in processing bottlenecks) 
 
 #Physical Memory Profile (Jan Zimmer)
 
