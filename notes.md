@@ -165,10 +165,18 @@ A small benchmark analysis was performed on 3 of these branches (all except [hhv
  - `graph_precentage_surf(percentage )` [(link)][graph_percentage_surf]: the time required by `percentagee` of the requests to complete
  - `graph_request_surf()` [(link)][graph_request_surf]: the number of requests per second processed
  - `graph_total_surf()` [(link)][graph_total_surf]: total time required to execute requests
- #CONFIGUTARION
+ 
+ All benchmarks were run on Release configuration hhvm builds, each with request end object sweeping enabled (disabling this leads to errors regarding open file limits). The specs of the computer used were:
+  - Fedora20 based workstation
+  - Linux kernel version: 3.12.6-300.fc20.x86_64
+  - Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
+  - 4x4G *MHZ
+  - Swap Disabled
+  - hhvm builds on internal SSD
+
 
 ####Results
-The first set of graphs show the time required by various percentages of the requests performed to complete (lower is better).
+The first set of graphs show the time required by various percentages of the requests performed to complete (lower is better, values in milliseconds).
 ![percentage_20_surf](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
 This graph shows that, for the lower 20% of response times, the number performance of each of the builds is dependent on the number of concurrent requests. This involves a small sample size and may not be representative. 
 ![percentage_50_surf](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
@@ -176,11 +184,19 @@ Of all the graphs in this section, this one is the most interesting and useful. 
 ![percentage_80_surf](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
 This graph is less useful as, due to the large sample size and long warm-up response times, alot of noise is present. It still shows that, like the previous graph, [hhvmbumpnobump][hhvmbumpnobump] performs the worst.
 
-The second set of graphs show the number of requests processed per second and the total time required to execute the requests.
+The second set of graphs show the number of requests processed per second (higher is better) and the total time required to execute the requests (lower is better) respectively.
 ![request_ps_surf](images/request_ps_surf_graph.png "Average requests per second of benchmark")
-
+This graph shows that the removal of reference counting incurs a notable request processing penalty (especially in larger sample sizes)
 ![total_time_surf](images/total_time_surf_graph.png "Total execution time of benchmark")
-GRAPHS AND JUSTIFICATION (IE ARRAYDATA COPYING)
+Again this graph shows that the removal of reference counting results in higher overall benchmark execution time
+
+####Analysis
+Contrary to expectations, the naive removal of reference counting from hhvm resulted in overall worse performance across the board. Due to time constraints the cause of this result is unconfirmed. A potential cause is the copy-on-write semantics of PHP arrays and data structures. As previously discussed the copying behavior of ArrayData and StringData objects is dependent on the call `bool hasMultipleRefs() const` and in configurations where this call is inaccurate needless copying of data structures may occur inturn causing a performance penalty. While this hypothesis was not tested (due to time constraints) it could be verified by profiling and comparing the memory usage of [hhvmbumpnocount][hhvmbumpnocount] and [hhvmbump][hhvmbump].
+
+##Further Work:
+ - Analyse refcounting performance in copy-on-assign environment
+ - Benchmark true request based GC (no freeing during request).
+ - Analyse memory usage/request speed relationship (high concurrency performance may become memory bounded with these modifications) 
 
 ##Other
 
