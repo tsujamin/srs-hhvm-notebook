@@ -16,7 +16,6 @@
 ##Our Tasks
  - To isolate the affect of naive reference counting on HHVM's performance
  - To observe how memory access maps to actual physical memory access
- - JAN
  - NATHAN
 
 ----------------------
@@ -113,6 +112,7 @@ The configuration used for benchmarking:
 ##Results:
  - Results were graphed as surfaces using Matlab
  - All results are graphed against total requests and concurrent-requests
+ - [hhvmnocount][hhvmnocount] is omitted from the results due to segmentation faults in Release configuration
  
 ##Percentage Response Times (milliseconds, lower is better)
 ![Time taken for 20% of requests to execute](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
@@ -158,15 +158,114 @@ The configuration used for benchmarking:
 
 - Again shows that the removal of reference counting results in longer execution times
 
+##Why Did This Happen?
+ - Remains uncertain
+ - Benchmark chosen not representative of real PHP workload?
+ - Copy on Write behaviour?
+ 
+##Copy on Write
+ - As previously mentioned, copy on write requires exact reference counts
+ - ArrayData and StringData mutation behaviour based on the `hasMultipleRefs()` call (which is inaccurate in [hhvmbumpnocount][hhvmbumpnocount] build)
+ - Over zealous copying may have occurred on mutation, resulting in performance penalty
+ - Could be confirmed by profiling and comparing memory usage of [hhvmbump][hhvmbump] and [hhvmbumpnocount][hhvmbumpnocount]
+ 
+##Further Work
+Due to time constraints, several questions and problems remain unsolved:
+
+ - Identify source of negative result
+ - Re-run benchmark with Copy on Assignment semantics (potential method for previous point)
+ - Benchmark true request based GC (This was attempted early on before focus shifted to reference counting)
+ - Analyse the relationship between memory usage and response time (these modifications begin make memory a player in processing bottlenecks) 
+
 #Physical Memory Profile (Jan Zimmer)
 
 ##Physical Memory Profile
 - Memory utilization
+
+![](images/PhysicalMemory1.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory2.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory3.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory4.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory5.png "Memory utilization")
+
+----------------
+
+- Memory utilization
+
+![](images/PhysicalMemory6.png "Memory utilization")
+
+----------------
+
+- What HHVM can give us
+
+![](images/PhysicalMemory7.png "Memory utilization")
+
+----------------
+
+- What Valgrind can give us
+
+![](images/PhysicalMemory8.png "Memory utilization")
+
+----------------
+
+- What Valgrind and HHVM can give us
+
+![](images/PhysicalMemory9.png "Memory utilization")
+
+----------------
+
+- How they actually fit together
+
+![](images/PhysicalMemory10.png "Memory utilization")
+
+----------------
+
+- How they actually fit together
+
+![](images/PhysicalMemory11.png "Memory utilization")
+
+----------------
+
+
+- How they actually fit together
+
+![](images/PhysicalMemory12.png "Memory utilization")
+
+----------------
+
+
+- What you should get out of it
+
+![](images/PhysicalMemoryGraph.png "Memory utilization")
+
+----------------
+
+
 - Tool: Valgrind
   - Get Memory Sectors from HHVM
   - Monitor memory loads and stores from valgrind
-  - Valgrind a little too powerful
-- Future 
+  - Valgrind alternates with HHVM in execution
+
 
 #NATHAN TASK (Nathan Yong)
 
