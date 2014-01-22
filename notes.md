@@ -54,7 +54,7 @@ While not throughly investigated it appears strings ([string-data.h][string-data
 Memory management within HHVM is split into several different varieties. 
 
 1. At the lowest level we have raw calls to `malloc`, `free` and friends. The
-   default build for HHVM is to use /jemalloc/ instead of system `malloc`.
+   default build for HHVM is to use _jemalloc_ instead of system `malloc`.
    
    Memory chunks allocated using these commands are typically internal C++
    objects, but sometimes they are used for PHP objects (certain types of
@@ -145,6 +145,7 @@ The branches resulting from the removal of reference counting and memory managem
  - [hhvmnocount][hhvmnocount]: A branch of HHVM with reference counting operations disabled. Currently suffers seg-faults when build in Release mode (but not in Debug) 
  - [hhvmbump][hhvmbump]: A branch with a continuous allocator in place of the free-list based smart allocator. Treats all sized allocations as a single type. Still performs reference counting operations. Used as a baseline comparison to hhvmnocount due to similar memory characteristics.
  - [hhvmbumpnocount][hhvmbumpnocount]: A merger of the hhvmbump and hhvmnocount branches
+
 ###Reference counting analysis
 One of our tasks was to determine the performance penalty incurred by the use of eager reference counting in hhvm. In order to do this we worked to remove as many reference count mutating operations from the code bases static code and disable the emitting of reference counting related JIT operations. These changes resulted in the branch ([hhvmnocount][hhvmnocount]) being incomparible to the standard hhvm build due to wildly different memory usage characteristics. In order to isolate the effect of reference counting alone, this build was merged with and compared to a build with a continuous allocator ([hhvmbumpnocount][hhvmbumpnocount] and [hhvmbump][hhvmbump]). As they all now exhibited similar memory usage patterns, reference counting could be isolated in the following benchmarks.
 
