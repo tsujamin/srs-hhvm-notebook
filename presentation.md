@@ -253,6 +253,15 @@ Due to time constraints, several questions and problems remain unsolved:
 
 ----------------
 
+
+- What you should get out of it
+
+![](images/PhysicalMemoryGraph.png "Memory utilization")
+
+----------------
+
+
+
 - 
 
 - Tool: Valgrind
