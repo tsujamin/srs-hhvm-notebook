@@ -90,9 +90,10 @@ documented in [memory-manager.cpp][memory-manager.cpp]:
    falls through to the 'large allocations' category. This category of
    allocations is managed by the front-facing functions (`smart_malloc`,
    `smart_free`, `smartMalloc`, etc) located in
-   [memory-manager.cpp](memory-manager.cpp). They are used for the majority of
-   allocations.
-
+   [memory-manager.cpp](memory-manager.cpp). It actually seems to be used
+   relatively infrequently. However, it is still called by array and string
+   generation code as storage, and by many extensions.
+   
 ![picture](images/mm_call_graph.png "Memory manager call graph")
 
 At the conclusion of a request `void hphp_session_exit()` is executed ([program-functions.cpp][program-functions.cpp]). This function is responsible for calling the `Sweepable::sweep()`([sweepable.h][sweepable.h]) method of all enlisted sweepable objects via `MemoryManager::sweep()` ([memory-manager.cpp][memory-manager.cpp]) and calls `MemoryManager::resetAllocator()` (also in [memory-manager.cpp][memory-manager.cpp]).
