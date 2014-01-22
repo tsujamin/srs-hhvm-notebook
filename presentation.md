@@ -180,86 +180,85 @@ Due to time constraints, several questions and problems remain unsolved:
 #Physical Memory Profile (Jan Zimmer)
 
 ##Physical Memory Profile
-- Memory utilization
 
 ![](images/PhysicalMemory1.png "Memory utilization")
 
 ----------------
 
-- Memory utilization
+## Memory utilization
 
 ![](images/PhysicalMemory2.png "Memory utilization")
 
 ----------------
-
-- Memory utilization
+## Memory utilization
 
 ![](images/PhysicalMemory3.png "Memory utilization")
 
 ----------------
 
-- Memory utilization
+## Memory utilization
 
 ![](images/PhysicalMemory4.png "Memory utilization")
 
 ----------------
 
-- Memory utilization
+## Memory utilization
 
 ![](images/PhysicalMemory5.png "Memory utilization")
 
 ----------------
 
-- Memory utilization
+## Memory utilization
 
 ![](images/PhysicalMemory6.png "Memory utilization")
 
 ----------------
 
-- What HHVM can give us
+## What HHVM can give us
 
 ![](images/PhysicalMemory7.png "Memory utilization")
 
 ----------------
 
-- What Valgrind can give us
+## What Valgrind can give us
 
 ![](images/PhysicalMemory8.png "Memory utilization")
 
 ----------------
 
-- What Valgrind and HHVM can give us
+## What Valgrind and HHVM can give us
 
 ![](images/PhysicalMemory9.png "Memory utilization")
 
 ----------------
 
-- How they actually fit together
+## How they actually fit together
 
 ![](images/PhysicalMemory10.png "Memory utilization")
 
 ----------------
 
-- How they actually fit together
+## How they actually fit together
 
 ![](images/PhysicalMemory11.png "Memory utilization")
 
 ----------------
 
 
-- How they actually fit together
+## How they actually fit together
 
 ![](images/PhysicalMemory12.png "Memory utilization")
 
 ----------------
 
 
-- What you should get out of it
+## What you should get out of it
 
 ![](images/PhysicalMemoryGraph.png "Memory utilization")
 
 ----------------
 
+## Physical Memory Profile
 
 - Tool: Valgrind
   - Get Memory Sectors from HHVM
