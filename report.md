@@ -35,21 +35,35 @@ These modified builds were unable to run standard PHP applications (such as the 
 - Results graphed using Matlab
 - All sources and results available [here][srs_notebook]
 
-###Results:
-Unfortunately due to segmentation faults in Release mode: hhvmnocount was omitted from the following graphs.
+###Graphs
 
 ![Time taken for the quickest 50% of requests to execute (lower is better)](images/percentage_50_surf_graph_s.png "Time taken for the quickest 50% of requests to execute (lower is better)")
-
-Figure 1 shows that the hhvmbumpnocount build, which logically should have performed the least operations due to its lack of reference counting, performed consistently worse than hhvmbump.
 
 ![Average requests per second of benchmark (higher is better)](images/request_ps_surf_graph_s.png "Average requests per second of benchmark (higher is better)")
 
 ![Total execution time of benchmark (lower is better)](images/total_time_surf_graph_s.png "Total execution time of benchmark (lower is better)")
 
+###Results
+Unfortunately due to segmentation faults in Release mode: hhvmnocount was omitted from the following graphs.
+
+Figure 1 shows that the hhvmbumpnocount build, which logically should have performed the least operations due to its lack of reference counting, performed consistently worse than hhvmbump.
+
 Figures 2 and 3 show respectively that hhbmbump no count processed the least requests per second and took overall the longest amount of time to execute the benchmarks.
 
 ###Analysis
-This data was gathered late in the project timeline so the following analysis is fairly rough. One major issue 
+This data was gathered late in the project timeline so the following analysis is fairly rough. As previously mentioned the benchmark used is not representative of regular PHP workloads. Another issue is potentially incorrect application of the PHP copy-on-write behaviour in builds lacking reference counting.
+
+The copy on write behaviour of php objects requires classes such as ArrayData and StringData to behave differently on mutation when referenced multiple times. Based on the call `hasMultipleRefs()` these classes will either copy themselves (when call returns true) before mutation to preserve assign-by-value semantics or mutate in place (when call returns false). In hhvmnocount and hhvmbumpnocount this call returns incorrect values; perhaps leading to over zealous copying of arrays and therefore performance penalties. This has not yet been tested but could easily be done by comparing the memory usage of the nocount builds against hhvmbump (which preserves copy-on-write behaviour).
+ 
+###Further Work
+Due to time constraints, several questions and problems remain unsolved:
+
+ - The cause of the described negative result (performance penalty resulting from reference count removal).
+ - Re-run benchmark with copy on assignment semantics (as a possible solution to the above problem).
+ - Benchmark the performance of a pure request based memory manager (where no freeing occurs mid request). This was attempted early on with promising results before focus changed.
+ - Analyse the relationship between memory usage and response time as these modifications introduce memory as a potential performance bottleneck.
+ - Preserve the copy-on-write semantics of PHP whilst removing exact reference counting.
+
 
 [render_command]: pandoc report.md -o report.pdf
 [references]: below
