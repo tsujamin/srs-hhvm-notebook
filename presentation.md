@@ -115,7 +115,7 @@ The configuration used for benchmarking:
  - [hhvmnocount][hhvmnocount] is omitted from the results due to segmentation faults in Release configuration
  
 ##Percentage Response Times (milliseconds, lower is better)
-![Time taken for 20% of requests to execute](images/percentage_20_surf_graph.png "Time taken for 20% of requests to execute")
+![Time taken for 20% of requests to execute](images/percentage_20_surf_graph_s.png "Time taken for 20% of requests to execute")
 
 -----------------
 
@@ -124,7 +124,7 @@ The configuration used for benchmarking:
  
  ----------------
  
-![Time taken for 50% of requests to execute](images/percentage_50_surf_graph.png "Time taken for 50% of requests to execute")
+![Time taken for 50% of requests to execute](images/percentage_50_surf_graph_s.png "Time taken for 50% of requests to execute")
 
 -----------------
 
@@ -135,7 +135,7 @@ The configuration used for benchmarking:
 
 -----------------
 
-![Time taken for 80% of requests to execute](images/percentage_80_surf_graph.png "Time taken for 80% of requests to execute")
+![Time taken for 80% of requests to execute](images/percentage_80_surf_graph_s.png "Time taken for 80% of requests to execute")
 
 -----------------
 
@@ -144,7 +144,7 @@ The configuration used for benchmarking:
  - Still shows, like the previous graph, that [hhvmbumpnocount][hhvmbumpnocount] performs the worst.
   
 ##Requests Processed per Second (higher is better)
-![Average requests per second of benchmark](images/request_ps_surf_graph.png "Average requests per second of benchmark")
+![Average requests per second of benchmark](images/request_ps_surf_graph_s.png "Average requests per second of benchmark")
 
 ------------------
 
@@ -152,7 +152,7 @@ The configuration used for benchmarking:
  - Penalty very noticeable in longer benchmark runs
 
 ##Total Execution Time
-![Total execution time of benchmark](images/total_time_surf_graph.png "Total execution time of benchmark")
+![Total execution time of benchmark](images/total_time_surf_graph_s.png "Total execution time of benchmark")
 
 ------------------
 
@@ -179,87 +179,87 @@ Due to time constraints, several questions and problems remain unsolved:
 
 #Physical Memory Profile (Jan Zimmer)
 
-##Physical Memory Profile
-- Memory utilization
+##Memory Utilisation
 
-![](images/PhysicalMemory1.png "Memory utilization")
-
-----------------
-
-- Memory utilization
-
-![](images/PhysicalMemory2.png "Memory utilization")
+![](images/PhysicalMemory1.png)
 
 ----------------
 
-- Memory utilization
+## Memory utilisation
 
-![](images/PhysicalMemory3.png "Memory utilization")
-
-----------------
-
-- Memory utilization
-
-![](images/PhysicalMemory4.png "Memory utilization")
+![](images/PhysicalMemory2.png)
 
 ----------------
 
-- Memory utilization
+## Memory utilisation
 
-![](images/PhysicalMemory5.png "Memory utilization")
-
-----------------
-
-- Memory utilization
-
-![](images/PhysicalMemory6.png "Memory utilization")
+![](images/PhysicalMemory3.png)
 
 ----------------
 
-- What HHVM can give us
+## Memory utilisation
 
-![](images/PhysicalMemory7.png "Memory utilization")
-
-----------------
-
-- What Valgrind can give us
-
-![](images/PhysicalMemory8.png "Memory utilization")
+![](images/PhysicalMemory4.png)
 
 ----------------
 
-- What Valgrind and HHVM can give us
+## Memory utilisation
 
-![](images/PhysicalMemory9.png "Memory utilization")
-
-----------------
-
-- How they actually fit together
-
-![](images/PhysicalMemory10.png "Memory utilization")
+![](images/PhysicalMemory5.png)
 
 ----------------
 
-- How they actually fit together
+## Memory utilisation
 
-![](images/PhysicalMemory11.png "Memory utilization")
+![](images/PhysicalMemory6.png)
 
 ----------------
 
+## What HHVM can give us
 
-- How they actually fit together
+![](images/PhysicalMemory7.png)
 
-![](images/PhysicalMemory12.png "Memory utilization")
+----------------
+
+## What Valgrind can give us
+
+![](images/PhysicalMemory8.png)
+
+----------------
+
+## What Valgrind and HHVM can give us
+
+![](images/PhysicalMemory9.png)
+
+----------------
+
+## How they actually fit together
+
+![](images/PhysicalMemory10.png)
+
+----------------
+
+## How they actually fit together
+
+![](images/PhysicalMemory11.png)
 
 ----------------
 
 
-- What you should get out of it
+## How they actually fit together
+
+![](images/PhysicalMemory12.png)
+
+----------------
+
+
+## An example of the result
 
 ![](images/PhysicalMemoryGraph.png "Memory utilization")
 
 ----------------
 
+## Physical Memory Profile
 
 - Tool: Valgrind
   - Get Memory Sectors from HHVM
