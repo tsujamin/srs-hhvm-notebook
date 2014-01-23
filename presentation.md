@@ -7,7 +7,7 @@
 
 ##Background
  - HipHopVM is an Free and Open Source PHP engine
- - Written primarily in C++ with moderate amounts of PHP and x86_64 assembly
+ - Written primarily in C++ with moderate amounts of PHP and x86_64 assembly (1.2 million lines of code total)
  - It uses a JIT compiler (though historically it translated PHP to C++ for AOT compilation)
  - It is the PHP engine designed by and which hosts Facebook
  - Its on GitHub! [https://github.com/facebook/hhvm][hhvm_github]
@@ -18,54 +18,92 @@
  - To observe how memory access maps to actual physical memory access
  - To map and analyse the behaviour of HHVM's internal memory management
 
-----------------------
+#Understanding the 'Smart' Memory Manager (Nathan Yong)
 
-Before continuing we will briefly introduce some relevant concepts
+##How do we view memory?
+![](images/mm_overview.png)
 
-#Internals of HHVM
+----------------
 
-##Reference Counting in the PHP language
- - Based on explicit garbage collection (reference counting)
- - Required by language semantics
- - PHP is **pass by value**
- - Pass by value can be slow due to large amount of copies (especially with large arrays)
+##How HHVM sees memory
+![](images/mm_call_graph.png)
+
+----------------
+
+##Why is this important?
+
+- Smart memory manager not very well understood
+- Usage of own tools very inconsistent
+
+----------------
+
+##What is it doing?
+
+![](images/n_memory_stacks.png)
+
+----------------
+
+##What is it doing?
+
+![](images/n_object_lifespan.png)
+
+----------------
+
+##What is it doing?
+
+![](images/n_allocated_memory.png)
+
+----------------
+
+##What is it doing?
+
+![](images/n_edge_case.png)
+
+----------------
+
+##Where to from here?
+
+- Opportunities for optimisation
+  - Unified consistent interface
+  - More efficient allocator design
+- Possible use in conjunction with other tools
  
-
------------------------
-
- - Solution: Copy on Write!
- - Problem: Need to know current reference count
- - Each mutation requires immediate increment and decrement of reference counts
- - Advantage: Immediate garbage reclamation
- - **This requirement will cause us major problems shortly**
- 
-
-##Reference Counting in HHVM (C++)
- - Reference counted objects have an `int_32t m_count` field and call a macro in [countable.h][countable.h] containing various reference counting operations (`incRefCont()`, `hasMultipleRefs()`, `decRefAndRelease()` etc)
- - Not consistently used (certain places directly mutate `m_count` or define separate ref-counting methods)
- - Difficult to track down all mutations of `m_count`
-
-##Reference Counting in HHVM (JIT)
- - `int_32t m_count` at a common offset (12 bytes) in all refcounted objects
- - Several opcodes emit reference counting assembly via the JIT
- - Intermediate Representation is optimised to remove inc/dec pairs where safe to do so
- - Simpler to locate, more difficult to understand
- 
---------------------
- 
-**Both these systems are implemented independent of each other (`m_count` and destructors shared) and the memory manager**
- 
-##Memory Management
- - MENTION REQUEST LOCAL ETC, REQUIRED FOR CONTEXT LATER ON
- 
-##OTHER
-
 #HHVM Without Reference Counting (Benjamin Roberts)
 
 ##HHVM Without Reference Counting
  - Who needs reference counts? (besides the PHP semantics)
  - If we are freeing our heap at the end of request, why do we need immediate reclamation?
  - Lets try nail down the performance penalty of immediate reference counting.
+
+##Reference Counting in the PHP language
+  - Based on explicit garbage collection (reference counting)
+  - Required by language semantics
+  - PHP is **pass by value**
+  - Pass by value can be slow due to large amount of copies (especially with large arrays)
+ 
+
+ -----------------------
+
+  - Solution: Copy on Write!
+  - Problem: Need to know current reference count
+  - Each mutation requires immediate increment and decrement of reference counts
+  - Advantage: Immediate garbage reclamation
+  - **This requirement will cause us major problems shortly**
+
+##Reference Counting in HHVM (C++)
+  - Reference counted objects have an `int_32t m_count` field and call a macro in [countable.h][countable.h] containing various reference counting operations (`incRefCont()`, `hasMultipleRefs()`, `decRefAndRelease()` etc)
+  - Not consistently used (certain places directly mutate `m_count` or define separate ref-counting methods)
+  - Difficult to track down all mutations of `m_count`
+
+##Reference Counting in HHVM (JIT)
+  - `int_32t m_count` at a common offset (12 bytes) in all refcounted objects
+  - Several opcodes emit reference counting assembly via the JIT
+  - Intermediate Representation is optimised to remove inc/dec pairs where safe to do so
+  - Simpler to locate, more difficult to understand
+ 
+ --------------------
+ 
+ **Both these systems are implemented independent of each other (`m_count` and destructors shared) and the memory manager**
 
 ##Lets Modify HHVM 
 Removed/Disabled 3 forms of reference counting to create [hhvmnocount][hhvmnocount]:
@@ -176,6 +214,7 @@ Due to time constraints, several questions and problems remain unsolved:
  - Re-run benchmark with Copy on Assignment semantics (potential method for previous point)
  - Benchmark true request based GC (This was attempted early on before focus shifted to reference counting)
  - Analyse the relationship between memory usage and response time (these modifications begin make memory a player in processing bottlenecks) 
+ - Preserve copy-on-write behaviour without reference counting
 
 #Physical Memory Profile (Jan Zimmer)
 
@@ -265,58 +304,6 @@ Due to time constraints, several questions and problems remain unsolved:
   - Get Memory Sectors from HHVM
   - Monitor memory loads and stores from valgrind
   - Valgrind alternates with HHVM in execution
-
-#Understanding the 'Smart' Memory Manager (Nathan Yong)
-
-##How do we view memory?
-![](images/mm_overview.png)
-
-----------------
-
-##How HHVM sees memory
-![](images/mm_call_graph.png)
-
-----------------
-
-##Why is this important?
-
-- Smart memory manager not very well understood
-- Usage of own tools very inconsistent
-
-----------------
-
-##What is it doing?
-
-![](images/n_memory_stacks.png)
-
-----------------
-
-##What is it doing?
-
-![](images/n_object_lifespan.png)
-
-----------------
-
-##What is it doing?
-
-![](images/n_allocated_memory.png)
-
-----------------
-
-##What is it doing?
-
-![](images/n_edge_case.png)
-
-----------------
-
-##Where to from here?
-
-- Opportunities for optimisation
-  - Unified consistent interface
-  - More efficient allocator design
-- Possible use in conjunction with other tools
-
-#Conclusion and Further Work
 
 [render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
 [references]: below
