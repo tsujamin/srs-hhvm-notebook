@@ -266,8 +266,55 @@ Due to time constraints, several questions and problems remain unsolved:
   - Monitor memory loads and stores from valgrind
   - Valgrind alternates with HHVM in execution
 
-
 #Understanding the 'Smart' Memory Manager (Nathan Yong)
+
+##How do we view memory?
+![](images/mm_overview.png)
+
+----------------
+
+##How HHVM sees memory
+![](images/mm_call_graph.png)
+
+----------------
+
+##Why is this important?
+
+- Smart memory manager not very well understood
+- Usage of own tools very inconsistent
+
+----------------
+
+##What is it doing?
+
+![](images/n_memory_stacks.png)
+
+----------------
+
+##What is it doing?
+
+![](images/n_object_lifespan.png)
+
+----------------
+
+##What is it doing?
+
+![](images/n_allocated_memory.png)
+
+----------------
+
+##What is it doing?
+
+![](images/n_edge_case.png)
+
+----------------
+
+##Where to from here?
+
+- Opportunities for optimisation
+  - Unified consistent interface
+  - More efficient allocator design
+- Possible use in conjunction with other tools
 
 #Conclusion and Further Work
 

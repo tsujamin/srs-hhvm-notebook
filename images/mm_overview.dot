@@ -1,0 +1,18 @@
+digraph G {
+    ranksep=0.75;
+    {
+        PHP [label="PHP object allocation"];
+        SMM [label="HHVM Smart Memory Manager"];
+        SYS [label="malloc, free and friends"];
+        PHPv [label="unlimited, managed access"][color=gray];
+        SYSv [label="directly access virtual memory"][color=gray];
+
+        PHP -> SMM -> SYS;
+        PHP -> PHPv;
+        SMM -> SYSv;
+        SYS -> SYSv;
+
+        {rank=same; PHP, PHPv};
+        {rank=same; SYS, SYSv};
+    }
+}
