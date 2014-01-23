@@ -2,19 +2,21 @@
 % Benjamin Roberts, Nathan Yong, Jan Zimmer
 % HHVM Group, Summer Research Scholarship 2013/14
 
-##Background
+#Background
 HipHopVM is an Free and Open Source PHP engine written primarily in C++, with moderate amounts of PHP and x86_64 assembly, totalling approximately 1.2 million lines of code. It uses a Just In Time compiler, though historically it translated PHP to C++ for ahead of time compilation. It is the primary PHP backend used on Facebook's infrastructure.
 
-##Our Tasks
+#Our Tasks
 Our specific tasks as part of the ANU Summer Research Scholarship were to:
  - To isolate the affect of naive reference counting on HHVM's performance (Benjamin Roberts)
  - To observe how memory access maps to actual physical memory access (Jan Zimmer)
  - To map and analyse the behaviour of HHVM's internal memory management (Nathan Yong)
  
-#HHVM Without Reference Counting (Benjamin Roberts)
-When using an allocator which free's all allocated memory at request end (such as that used in HHVM), the immediate reclamation provided by naive reference counting become less attractive.
+##HHVM Without Reference Counting (Benjamin Roberts)
+When using an allocator which free's all allocated memory at request end (such as that used in HHVM), the immediate reclamation provided by naive reference counting become less attractive. Whilst the semantics of the PHP language enforce the use of naive reference counting we can still try to analyse its impact.
 
-[render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
+
+
+[render_command]: pandoc report.md -o report.pdf
 [references]: below
 [hhvm_github]: https://github.com/facebook/hhvm
 
