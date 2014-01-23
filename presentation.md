@@ -7,7 +7,7 @@
 
 ##Background
  - HipHopVM is an Free and Open Source PHP engine
- - Written primarily in C++ with moderate amounts of PHP and x86_64 assembly
+ - Written primarily in C++ with moderate amounts of PHP and x86_64 assembly (1.2 million lines of code total)
  - It uses a JIT compiler (though historically it translated PHP to C++ for AOT compilation)
  - It is the PHP engine designed by and which hosts Facebook
  - Its on GitHub! [https://github.com/facebook/hhvm][hhvm_github]
