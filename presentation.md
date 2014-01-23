@@ -305,8 +305,6 @@ Due to time constraints, several questions and problems remain unsolved:
   - Monitor memory loads and stores from valgrind
   - Valgrind alternates with HHVM in execution
 
-#Conclusion and Further Work
-
 [render_command]: pandoc -t beamer presentation.md -V theme:Warsaw -o presentation.pdf
 [references]: below
 [hhvm_github]: https://github.com/facebook/hhvm
