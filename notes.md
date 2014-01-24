@@ -150,6 +150,9 @@ have been to convert the mx utilities (in `hphp/util/mx.h`) into thread-local
 singletons like the memory manager, so that they could have a consistent method
 of accessing inner data.
 
+The build is stored as a git bundle. To extract it, run `git bundle unbundle
+/path/to/memory_tracking.gitbundle` while in a HHVM repository.
+
 An attempt at instrumenting malloc() directly ran into complications after HHVM
 turned out to be dependent on certain jemalloc-based functions behaving in a
 particular manner. This may have been an artefact of poor instrumentation,
