@@ -67,7 +67,7 @@ Due to time constraints, several questions and problems remain unsolved:
 ##Analyzing memory accesses (Jan Zimmer)
 All memory must end somewhere. But how is it accessed?
 
-The goal of this task was to analyze memory access within the vm's representation of the php objects. This was to be achieved by tracking down where the actual php objects get created within hhvm, and then use Valgrind to record memory loads and stores to the memory block where the php object got created. 
+The goal of this task was to analyze memory access within the vm's representation of the php objects. This was to be achieved by tracking down where the actual php objects become created within hhvm, and then use Valgrind to record memory loads and stores to the memory block where the php object got created. 
 
 This analysis can then be used to optimize for frequently accessed sectors, or optimization of sectors which aren't used anymore. 
 
@@ -93,7 +93,7 @@ Potential analysis which could be taken from something like this are:
 The current workflow extracts the addresses of objects to monitor by printing them out from the HHVM code. And the addresses of accessed memory sectors are printed during the Valgrind's interpretation of the HHVM code. However, these two things are not actually executed in parallel, but are executed alternately. For efficiency reasons in Valgrind, it will interpret multiple instructions in one block and then execute them in one block instead of alternating after every single instruction.   
 The problem which is encountered by this is that during a call to create an object, Valgrind will first interpret that instruction, but due to the complexity of extracting specific memory sector content out of Valgrind, this will not produce anything in the logs. Several accesses to that location happen which are observed but are not regarded as relevant yet. Before the block of execution comes to an end, it is deallocated again.   
 The end effect of all of this is that Valgrind ignores all memory accesses to that memory location as it hasn't been specifically told during the HHVM execution to monitor those memory addresses. And as the object has also already been deallocated before having been told about it in the first place, Valgrind will have missed all memory access.  
-It unfortunately is not a possibility to offset the two logs cleverly to overlap properly as it is common for the same memory address to get allocated and deallocated multiple times within the same block, and then even an offset won't be able to tell which memory accesses pertain to which particular version of the object. 
+It unfortunately is not a possibility to offset the two logs cleverly to overlap properly as it is common for the same memory address to become allocated and deallocated multiple times within the same block, and then even an offset won't be able to tell which memory accesses pertain to which particular version of the object. 
 
 ###Further Work
 What the project still needs:
