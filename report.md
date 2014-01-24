@@ -109,7 +109,7 @@ In addition to this, the usage of the smart memory manager has grown to the poin
 
 Analysis of the memory manager was done by annotating all important smart memory manager functions with calls to a logging function, which would then calculate block lifetimes and output information about allocations and deallocations. The relevant smart memory manager function would also be logged, which could be used to reason about how much of the heap is being used by which parts of the virtual machine. 
 
-Initially, the CSV output of the patch was analysed using the R language, but ultimately Python scripts were used to do some more advanced parsing of the log file in order to determine, for example, the average lifetime of a block of memory. The graphs were inspired by the graphs in the [DaCapo Benchmarks paper][dacapo], which showed the average lifetime of blocks of memory, as well as the structure of the heap at any time.
+Initially, the CSV output of the patch was analysed using the R language, but ultimately [Python scripts][analysis.py] were used to do some more advanced parsing of the log file in order to determine, for example, the average lifetime of a block of memory. The graphs were inspired by the graphs in the [DaCapo Benchmarks paper][dacapo], which showed the average lifetime of blocks of memory, as well as the structure of the heap at any time.
 
 ###Graphs
 
@@ -153,3 +153,4 @@ Eventually, the patch could be incorporated into a detailed heap profiling tools
 [hhvmbumpnocount]: https://github.com/TsukasaUjiie/hhvm/tree/bump-point-no-refcounting
 
 [dacapo]: http://users.cecs.anu.edu.au/~steveb/downloads/pdf/dacapo-oopsla-2006.pdf
+[analysis.py]: https://github.com/TsukasaUjiie/srs-hhvm-notebook/blob/master/mm_instrumentation/visualisation.ipynb
