@@ -35,15 +35,13 @@ These modified builds were unable to run standard PHP applications (such as the 
 - Results graphed using Matlab
 - All sources and results available [here][srs_notebook]
 
-###Graphs
-
+###Results
 ![Time taken for the quickest 50% of requests to execute (lower is better)](images/percentage_50_surf_graph_s.png "Time taken for the quickest 50% of requests to execute (lower is better)")
 
 ![Average requests per second of benchmark (higher is better)](images/request_ps_surf_graph_s.png "Average requests per second of benchmark (higher is better)")
 
 ![Total execution time of benchmark (lower is better)](images/total_time_surf_graph_s.png "Total execution time of benchmark (lower is better)")
 
-###Results
 Unfortunately due to segmentation faults in Release mode: hhvmnocount was omitted from the following graphs.
 
 Figure 1 shows that the hhvmbumpnocount build, which logically should have performed the least operations due to its lack of reference counting, performed consistently worse than hhvmbump.
@@ -64,7 +62,7 @@ Due to time constraints, several questions and problems remain unsolved:
  - Analyse the relationship between memory usage and response time as these modifications introduce memory as a potential performance bottleneck.
  - Preserve the copy-on-write semantics of PHP whilst removing exact reference counting.
 
-##Analyzing memory accesses (Jan Zimmer)
+##Analyzing Memory Accesses (Jan Zimmer)
 All memory must end somewhere. But how is it accessed?
 
 The goal of this task was to analyze memory access within the vm's representation of the php objects. This was to be achieved by tracking down where the actual php objects become created within hhvm, and then use Valgrind to record memory loads and stores to the memory block where the php object got created.
@@ -100,9 +98,9 @@ What the project still needs:
 
 - Actual filtering of different objects so we don't record the objects of the c++ vm as well
 - Potential further filtering between different php primitives
-- A valgrind tool capable of detecting which sectors to monitor from within Valgrind's Intermediate-Representation and replacing the need for any large log files.
+- A Valgrind tool capable of detecting which sectors to monitor from within Valgrind's Intermediate-Representation and replacing the need for any large log files.
 
-##Visualising the behaviour of the Smart Memory Manager
+##Visualising the Behaviour of the Smart Memory Manager (Nathan Yong)
 HHVM's Smart Memory Manager is a hybrid memory manager, managing its blocks via a free list, but being backed by a 'reap' (region-heap), which, as discussed above, frees its memory after every request. However, in a similar theme to the reference counting API, the usage of the smart memory manager API (which is simple in itself) is also wildly varied and inconsistent.
 
 In addition to this, the usage of the smart memory manager has grown to the point where its behaviour becomes non-trivial, and it is used not only for storing PHP objects, but also C++ objects used in for the VM's own purposes. 
