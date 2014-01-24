@@ -29,7 +29,7 @@ These modified builds were unable to run standard PHP applications (such as the 
 - Linux kernel version: 3.12.6-300.fc20.x86_64
 - CPU: Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
 - Memory: 4x4G DDR3 memory at 1600MHz (no swap partiton)
-- internal ssd for HHVM builds
+- Internal SSD for HHVM builds
 - Release configuration
 - Apache Benchmark (ab) with various levels of concurrency and test lengths
 - Results graphed using Matlab
@@ -63,7 +63,44 @@ Due to time constraints, several questions and problems remain unsolved:
  - Benchmark the performance of a pure request based memory manager (where no freeing occurs mid request). This was attempted early on with promising results before focus changed.
  - Analyse the relationship between memory usage and response time as these modifications introduce memory as a potential performance bottleneck.
  - Preserve the copy-on-write semantics of PHP whilst removing exact reference counting.
+ 
+##Analyzing memory accesses (Jan Zimmer)
+All memory must end somewhere. But how is it accessed?
 
+The goal of this task was to analyze memory access within the vm's representation of the php objects. This was to be achieved by tracking down where the actual php objects become created within hhvm, and then use Valgrind to record memory loads and stores to the memory block where the php object got created. 
+
+This analysis can then be used to optimize for frequently accessed sectors, or optimization of sectors which aren't used anymore. 
+
+To do this, flags were inserted into the smart memory manager of HHVM to log all creations and destructions of objects and their corresponding address ranges. Valgrind was then simultaneously logging all load and stores of memory and their corresponding addresses. These two logs were interleaved and written to the same log file for synchronization.
+
+A parser was then written go over the log file, and actually record on a per object basis, how many reads and writes happened at different offsets to the object addresses. This approach however underwent several issues which in the end failed to make it usable, as will be mentioned below. 
+
+[The parser tool](https://github.com/TsukasaUjiie/srs-hhvm-notebook/tree/master/valgrind-tools/lackey_parser). 
+
+###Results
+![](images/PhysicalMemoryGraph.png "Combined Memory Accesses of Memory Manager Objects")
+
+_Disclaimer, these results are not yet representative of HHVM's actual behavior as the tool is not in working condition_
+
+As a demonstration what a tool like this might be able to produce, the tool was run over the center-of-mass benchmark, and filtered to any objects of 32 bytes in length, but as the tool still has no other filtering method, it is unknown whether these were php objects, and if they were, what kind of php objects they were. 
+
+Potential analysis which could be taken from something like this are:
+
+- The virtual machine appears to execute a lot more stores than loads on the memory. 
+- The memory sectors with offset 20-23 appear to be only rarely used, possibly due to changes in the hhvm data structures which no longer use that
+
+###Issues
+The current workflow extracts the addresses of objects to monitor by printing them out from the HHVM code. And the addresses of accessed memory sectors are printed during the Valgrind's interpretation of the HHVM code. However, these two things are not actually executed in parallel, but are executed alternately. For efficiency reasons in Valgrind, it will interpret multiple instructions in one block and then execute them in one block instead of alternating after every single instruction.   
+The problem which is encountered by this is that during a call to create an object, Valgrind will first interpret that instruction, but due to the complexity of extracting specific memory sector content out of Valgrind, this will not produce anything in the logs. Several accesses to that location happen which are observed but are not regarded as relevant yet. Before the block of execution comes to an end, it is deallocated again.   
+The end effect of all of this is that Valgrind ignores all memory accesses to that memory location as it hasn't been specifically told during the HHVM execution to monitor those memory addresses. And as the object has also already been deallocated before having been told about it in the first place, Valgrind will have missed all memory access.  
+It unfortunately is not a possibility to offset the two logs cleverly to overlap properly as it is common for the same memory address to become allocated and deallocated multiple times within the same block, and then even an offset won't be able to tell which memory accesses pertain to which particular version of the object. 
+
+###Further Work
+What the project still needs:
+
+- Actual filtering of different objects so we don't record the objects of the c++ vm as well
+- Potential further filtering between different php primitives
+- A valgrind tool capable of detecting which sectors to monitor from within Valgrind's Intermediate-Representation and replacing the need for any large log files. 
 
 [render_command]: pandoc report.md -o report.pdf
 [references]: below
