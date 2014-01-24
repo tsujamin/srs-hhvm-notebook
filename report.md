@@ -29,7 +29,7 @@ These modified builds were unable to run standard PHP applications (such as the 
 - Linux kernel version: 3.12.6-300.fc20.x86_64
 - CPU: Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
 - Memory: 4x4G DDR3 memory at 1600MHz (no swap partiton)
-- internal ssd for HHVM builds
+- Internal SSD for HHVM builds
 - Release configuration
 - Apache Benchmark (ab) with various levels of concurrency and test lengths
 - Results graphed using Matlab

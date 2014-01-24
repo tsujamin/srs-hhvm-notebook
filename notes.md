@@ -99,12 +99,25 @@ documented in [memory-manager.cpp][memory-manager.cpp]:
 At the conclusion of a request `void hphp_session_exit()` is executed ([program-functions.cpp][program-functions.cpp]). This function is responsible for calling the `Sweepable::sweep()`([sweepable.h][sweepable.h]) method of all enlisted sweepable objects via `MemoryManager::sweep()` ([memory-manager.cpp][memory-manager.cpp]) and calls `MemoryManager::resetAllocator()` (also in [memory-manager.cpp][memory-manager.cpp]).
 `MemoryManager::resetAllocator()` is responsible for freeing the slabs allocated by the memory manager, deallocates non-persistent large allocations and sweeps the enlisted strings.
 
+### Memory debugging headers
+In a debug build of HHVM, compiling will enable debug headers at the beginning
+of every allocated block, which are invisible to the runtime. These are
+generated through the `MemoryManager::debug...` functions. They are filled with
+magic values before allocation, which may be useful for manual memory
+poking. However, they do not report their own size to the memory manager so any
+reported statistics will be slightly off.
+
+If measuring memory usage through instrumentation of `malloc` (as attempted, to
+failure), then the debug headers should be disabled in order to get accurate
+results.
+
 ##PHP's type system within HHVM
 PHP has various kinds of data which are represented in HHVM as Type Variants, or
 TVs for short. The definitions for the various types are kept in
 [datatype.h][datatype.h] and the typed objects themselves are small pointer-like
 objects with type TypeVariant, which point to various external data. These are
-kept in [type-variant.h][type-variant.h].
+kept in [type-variant.h][type-variant.h]. The holding types are located in
+[datatype.h][datatype.h].
 
 Most of the complex data types are backed by smart-managed memory, specifically
 using `smartMallocSize`, often using the `NEWOBJ` macro. This does make it
@@ -114,6 +127,41 @@ manager is used to allocate storage for types, instead of allocating memory for
 the types themselves.
 
 ##Profiling/Instrumentation 
+
+###Memory Management tracing
+This information is relevant to the files inside the `mm_instrumentation`
+folder.
+
+One of our builds of HHVM has added functionality for tracing memory manager
+calls, output to a PID-dependent file in /tmp. Every lower-level call to the
+memory manager (as low as possible in the above chart) was annotated with a call
+to a function `HPHP::Util::mx_log`, which spits out the calling function, along
+with the size and the lifetime of an object (measured from allocation to
+deallocation in bytes).
+
+Memory Manager fields were prefixed `m_` (for 'memory') so the extra logging
+functions were prefixed `mx_` (for 'memory extra').
+
+The last attempted build was a trial at getting more information out of the
+annotation to the memory manager functions by providing a method by which to
+hint the logger to get information about what each block of memory was purposed
+for. However, compilation issues made this very difficult, the next step would
+have been to convert the mx utilities (in `hphp/util/mx.h`) into thread-local
+singletons like the memory manager, so that they could have a consistent method
+of accessing inner data.
+
+An attempt at instrumenting malloc() directly ran into complications after HHVM
+turned out to be dependent on certain jemalloc-based functions behaving in a
+particular manner. This may have been an artefact of poor instrumentation,
+though. Source is in the `mymalloc` folder.
+
+For small tests, in the `bench_press` folder, are some parser tests. The
+markdown parser in particular seems to produce unusual memory behaviour, however
+this is probably an issue with the parser code, not HHVM.
+
+Lastly, the `.ipynb` files are iPython notebooks for processing the csv output
+of `mx_log`. It depends on the `pandas`, `numpy` and `matplotlib` Python (3)
+packages.
 
 ###IR Tracing
 HHVM can be configured to output the IR (Intermediate Representation) of each function it encounters. This is enabled by running HHVM in an environment where `TRACE=printir:2` is enabled. The trace will be found in `/tmp/hphp.log`. The JIT emitted assembly can also be output alongside the IR, but this requires HHVM to be compiled against libxed (which can be found in the tarball for [Intel PIN][intel_pin]). The subsequent cmake command is:
@@ -235,6 +283,7 @@ Contrary to expectations, the naive removal of reference counting from hhvm resu
 [sweepable.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/sweepable.h
 [hphp-value.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/hphp-value.h
 [datatype.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/datatype.h
+[type-variant.h]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/hphp/runtime/base/type-variant.h
 [HPHPSetup.cmake]: https://github.com/TsukasaUjiie/hhvm/blob/e08ed9c6369459f17a6be8cd9cf988e840fb17bf/CMake/HPHPSetup.cmake
 
 
