@@ -260,9 +260,11 @@ Again this graph shows that the removal of reference counting results in higher 
 Contrary to expectations, the naive removal of reference counting from hhvm resulted in overall worse performance across the board. Due to time constraints the cause of this result is unconfirmed. A potential cause is the copy-on-write semantics of PHP arrays and data structures. As previously discussed the copying behaviour of ArrayData and StringData objects is dependent on the call `bool hasMultipleRefs() const` and in configurations where this call is inaccurate needless copying of data structures may occur in turn causing a performance penalty. While this hypothesis was not tested (due to time constraints) it could be verified by profiling and comparing the memory usage of [hhvmbumpnocount][hhvmbumpnocount] and [hhvmbump][hhvmbump].
 
 ##Further Work:
- - Analyse refcounting performance in copy-on-assign environment
- - Benchmark true request based GC (no freeing during request).
- - Analyse memory usage/request speed relationship (high concurrency performance may become memory bounded with these modifications) 
+- Identify source of negative result
+- Re-run benchmark with Copy on Assignment semantics (potential method for previous point)
+- Benchmark true request based GC (This was attempted early on before focus shifted to reference counting)
+- Analyse the relationship between memory usage and response time (these modifications begin make memory a player in processing bottlenecks) 
+- Preserve copy-on-write behaviour without reference counting 
 
 ##Other
 
